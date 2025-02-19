@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import EditTaskModal from "./EditTaskModal";
 
 interface Task {
   id: string;
