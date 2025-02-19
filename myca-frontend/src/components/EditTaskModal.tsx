@@ -63,8 +63,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
         <label>Status:</label>
         <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)} style={inputStyle}>
           <option value="">Select Status</option>
-          <option value="running">In Progress</option>
-          <option value="done">Completed</option>
+          <option value="inprogress">In Progress</option>
+          <option value="completed">Completed</option>
           <option value="cancled">Cancled</option>
         </select>
 

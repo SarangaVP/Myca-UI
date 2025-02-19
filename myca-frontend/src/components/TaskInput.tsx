@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { BASE_URL, AUTH_TOKEN } from "../config.ts";
 
-const TaskInput: React.FC<{ refreshTasks: () => void }> = ({ refreshTasks }) => {
+const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose?: () => void }> = ({
+  refreshTasks,
+  parentId = "",
+  onClose,
+}) => {
   const [taskName, setTaskName] = useState("");
-  const [taskType, setTaskType] = useState("task"); // Default type
+  const [taskType, setTaskType] = useState("task");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,9 +20,9 @@ const TaskInput: React.FC<{ refreshTasks: () => void }> = ({ refreshTasks }) => 
     const requestBody = {
       date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD
       item_name: taskName,
-      item_type: taskType, // Send selected type
+      item_type: taskType,
       item_status: "running",
-      parent_item_id: "",
+      parent_item_id: parentId, // Assign parent ID
       note: "",
     };
 
@@ -36,8 +40,9 @@ const TaskInput: React.FC<{ refreshTasks: () => void }> = ({ refreshTasks }) => 
 
       if (response.ok && data.status === 200) {
         setTaskName("");
-        setTaskType("task"); // Reset type to default
+        setTaskType("task");
         refreshTasks(); // Refresh task list
+        if (onClose) onClose(); // Close input after adding
       } else {
         throw new Error("Failed to add task");
       }
@@ -52,7 +57,6 @@ const TaskInput: React.FC<{ refreshTasks: () => void }> = ({ refreshTasks }) => 
   return (
     <div style={taskInputContainerStyle}>
       <div style={inputRowStyle}>
-        {/* Task Name Input */}
         <input
           type="text"
           value={taskName}
@@ -62,20 +66,13 @@ const TaskInput: React.FC<{ refreshTasks: () => void }> = ({ refreshTasks }) => 
           disabled={loading}
         />
 
-        {/* Task Type Dropdown */}
-        <select
-          value={taskType}
-          onChange={(e) => setTaskType(e.target.value)}
-          style={dropdownStyle}
-          disabled={loading}
-        >
+        <select value={taskType} onChange={(e) => setTaskType(e.target.value)} style={dropdownStyle} disabled={loading}>
           <option value="task">Task</option>
           <option value="note">Note</option>
           <option value="group">Group</option>
           <option value="link">Link</option>
         </select>
 
-        {/* Add Button */}
         <button onClick={handleAddTask} style={addButtonStyle} disabled={loading}>
           {loading ? "Adding..." : "Add"}
         </button>
@@ -88,53 +85,49 @@ const TaskInput: React.FC<{ refreshTasks: () => void }> = ({ refreshTasks }) => 
 
 // 🔹 **Styles**
 const taskInputContainerStyle: React.CSSProperties = {
-  padding: "15px",
+  marginTop: "10px",
+  padding: "10px",
   backgroundColor: "#fff",
-  borderRadius: "8px",
-  boxShadow: "0px 3px 6px rgba(0, 0, 0, 0.1)",
+  borderRadius: "6px",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
 };
 
 const inputRowStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: "10px",
+  gap: "8px",
 };
 
 const inputStyle: React.CSSProperties = {
   flex: 1,
-  padding: "10px",
-  borderRadius: "6px",
+  padding: "8px",
+  borderRadius: "4px",
   border: "1px solid #ccc",
   outline: "none",
-  fontSize: "16px",
+  fontSize: "14px",
 };
 
 const dropdownStyle: React.CSSProperties = {
-  padding: "10px",
-  borderRadius: "6px",
+  padding: "8px",
+  borderRadius: "4px",
   border: "1px solid #ccc",
   backgroundColor: "#fff",
-  fontSize: "16px",
-  cursor: "pointer",
+  fontSize: "14px",
 };
 
 const addButtonStyle: React.CSSProperties = {
   backgroundColor: "#007bff",
   color: "white",
-  padding: "10px 15px",
-  borderRadius: "6px",
+  padding: "8px 12px",
+  borderRadius: "4px",
   border: "none",
-  fontSize: "16px",
+  fontSize: "14px",
   cursor: "pointer",
-  fontWeight: "bold",
-  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-  transition: "0.2s ease-in-out",
 };
 
 const errorTextStyle: React.CSSProperties = {
   color: "red",
-  fontSize: "14px",
-  marginTop: "5px",
+  fontSize: "12px",
 };
 
 export default TaskInput;

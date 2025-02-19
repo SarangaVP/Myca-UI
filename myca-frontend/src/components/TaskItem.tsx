@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaPlus } from "react-icons/fa";
+import TaskInput from "./TaskInput";
 
 interface Task {
   id: string;
@@ -15,10 +16,12 @@ interface TaskItemProps {
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAddingChild, setIsAddingChild] = useState(false);
 
   return (
     <div style={taskContainerStyle}>
       <div style={taskRowStyle}>
+        {/* Expand/Collapse Button */}
         {task.children && task.children.length > 0 && (
           <button onClick={() => setIsExpanded(!isExpanded)} style={toggleButtonStyle}>
             {isExpanded ? "▼" : "▶"}
@@ -27,11 +30,23 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
 
         <span style={taskTextStyle}>{task.name}</span>
 
+        {/* Add Child Task Button */}
+        <button onClick={() => setIsAddingChild(!isAddingChild)} style={addButtonStyle}>
+          <FaPlus /> 
+        </button>
+
+        {/* Edit Task Button */}
         <button onClick={() => onEditTask(task)} style={editButtonStyle}>
           <FaEdit /> Edit
         </button>
       </div>
 
+      {/* Task Input for Adding a Child Task */}
+      {isAddingChild && (
+        <TaskInput refreshTasks={refreshTasks} parentId={task.id} onClose={() => setIsAddingChild(false)} />
+      )}
+
+      {/* Show Child Tasks */}
       {isExpanded && task.children && (
         <div style={childTaskContainerStyle}>
           {task.children.map((child) => (
@@ -76,6 +91,19 @@ const toggleButtonStyle: React.CSSProperties = {
   fontSize: "16px",
   cursor: "pointer",
   marginRight: "8px",
+};
+
+const addButtonStyle: React.CSSProperties = {
+  backgroundColor: "#28a745",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "5px",
+  border: "none",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+  transition: "0.2s ease-in-out",
 };
 
 const editButtonStyle: React.CSSProperties = {
