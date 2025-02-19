@@ -7,22 +7,30 @@ interface Task {
   children?: Task[];
 }
 
-const TaskList: React.FC<{ tasks: Task[] }> = ({ tasks }) => {
+interface TaskListProps {
+  tasks: Task[];
+  refreshTasks: () => void;
+  onEditTask: (task: Task) => void;
+}
+
+const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask, refreshTasks }) => {
   return (
-    <div
-      style={{
-        padding: "20px",
-        borderRadius: "10px",
-        backgroundColor: "#ffffff",
-        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-        width: "100%",
-      }}
-    >
+    <ul style={taskListContainerStyle}>
       {tasks.map((task) => (
-        <TaskItem key={task.id} task={task} />
+        <TaskItem key={task.id} task={task} refreshTasks={refreshTasks} onEditTask={onEditTask} />
       ))}
-    </div>
+    </ul>
   );
 };
 
+// 🔹 Styles
+const taskListContainerStyle: React.CSSProperties = {
+  marginTop: "20px",
+  backgroundColor: "#fff",
+  padding: "20px",
+  borderRadius: "8px",
+  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+};
+
 export default TaskList;
+

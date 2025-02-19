@@ -1,0 +1,5 @@
+const BASE_URL = "http://localhost:8000/walker";
+
+const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjQzNGMzMTAyNTBmMDgzZDA0ZjhmMiIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsInJvb3RfaWQiOiI2N2I0MzRjMzEwMjUwZjA4M2QwNGY4ZjEiLCJpc19hY3RpdmF0ZWQiOnRydWUsImlzX2FkbWluIjpmYWxzZSwiZXhwaXJhdGlvbiI6MTc0MDAwNTg4Niwic3RhdGUiOiJKSmtZNU5iRyJ9.Ex6bywe8YcOB96DQyG7wqLeBu8uPVrsthaEz_clRDe4"; 
+
+export { BASE_URL, AUTH_TOKEN };
