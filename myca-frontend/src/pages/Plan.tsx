@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import TaskInput from "../components/TaskInput";
 import TaskList from "../components/TaskList";
-
-const BASE_URL = "http://localhost:8000/walker";
-const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjQzNGMzMTAyNTBmMDgzZDA0ZjhmMiIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsInJvb3RfaWQiOiI2N2I0MzRjMzEwMjUwZjA4M2QwNGY4ZjEiLCJpc19hY3RpdmF0ZWQiOnRydWUsImlzX2FkbWluIjpmYWxzZSwiZXhwaXJhdGlvbiI6MTczOTk5OTUxMiwic3RhdGUiOiJRMnl2Ym9JcyJ9.MCHlZblcSJMPF1HZiDtiyQUViHt8MqTdHEhyj8LA6KY"; // Replace with actual API token
+import EditTaskModal from "../components/EditTaskModal";
+import { BASE_URL, AUTH_TOKEN } from "../config";
 
 interface Task {
   id: string;
@@ -20,26 +19,23 @@ interface PlanProps {
 
 const Plan: React.FC<PlanProps> = ({ tasks, addTask, setTasks }) => {
   const [loading, setLoading] = useState(true);
+  const [editingTask, setEditingTask] = useState<Task | null>(null); // Track task being edited
 
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
-  useEffect(() => {
+  const fetchTasks = () => {
+    setLoading(true);
     fetch(`${BASE_URL}/getItemsForNodes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${AUTH_TOKEN}`,
+        Authorization: `Bearer ${AUTH_TOKEN}`,
       },
       credentials: "include",
       body: JSON.stringify({ date_input: formattedDate, items_list: [] }),
     })
-      .then((response) => {
-        if (response.status === 401) {
-          throw new Error("Unauthorized: Invalid or expired token.");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         if (data.status === 200 && data.reports.length > 0) {
           const rawTasks: Task[] = data.reports[0].map((item: any) => ({
@@ -49,15 +45,9 @@ const Plan: React.FC<PlanProps> = ({ tasks, addTask, setTasks }) => {
           }));
 
           const taskMap = new Map<string, Task>();
+          rawTasks.forEach((task) => taskMap.set(task.id, { ...task, children: [] }));
 
-          // Create a map of tasks
-          rawTasks.forEach((task) => {
-            taskMap.set(task.id, { ...task, children: [] });
-          });
-
-          // Organize into nested structure
           const rootTasks: Task[] = [];
-
           rawTasks.forEach((task) => {
             if (task.parentId && taskMap.has(task.parentId)) {
               taskMap.get(task.parentId)!.children!.push(taskMap.get(task.id)!);
@@ -71,7 +61,11 @@ const Plan: React.FC<PlanProps> = ({ tasks, addTask, setTasks }) => {
       })
       .catch((error) => console.error("Error fetching tasks:", error))
       .finally(() => setLoading(false));
-  }, [setTasks]);
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   const displayDate = today.toLocaleDateString("en-US", {
     weekday: "long",
@@ -86,10 +80,11 @@ const Plan: React.FC<PlanProps> = ({ tasks, addTask, setTasks }) => {
 
       <TaskInput addTask={addTask} />
 
-      {loading ? <p>Loading tasks...</p> : <TaskList tasks={tasks} />}
+      {loading ? <p>Loading tasks...</p> : <TaskList tasks={tasks} refreshTasks={fetchTasks} onEditTask={setEditingTask} />}
+
+      {editingTask && <EditTaskModal task={editingTask} isOpen={true} onClose={() => setEditingTask(null)} refreshTasks={fetchTasks} />}
     </div>
   );
 };
 
 export default Plan;
-
