@@ -11,19 +11,15 @@ interface Task {
   children?: Task[];
 }
 
-interface PlanProps {
-  tasks: Task[];
-  addTask: (name: string) => void;
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-}
-
-const Plan: React.FC<PlanProps> = ({ tasks, addTask, setTasks }) => {
+const Plan: React.FC = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingTask, setEditingTask] = useState<Task | null>(null); // Track task being edited
 
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
+  // 🔹 Fetch Tasks from API
   const fetchTasks = () => {
     setLoading(true);
     fetch(`${BASE_URL}/getItemsForNodes`, {
@@ -78,11 +74,21 @@ const Plan: React.FC<PlanProps> = ({ tasks, addTask, setTasks }) => {
       <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "5px" }}>Plan</h2>
       <p style={{ fontSize: "18px", color: "#666", marginBottom: "15px" }}>{displayDate}</p>
 
-      <TaskInput addTask={addTask} />
+      {/* ✅ Use `refreshTasks` Instead of `addTask` */}
+      <TaskInput refreshTasks={fetchTasks} />
 
+      {/* ✅ Pass `refreshTasks` & `onEditTask` Correctly */}
       {loading ? <p>Loading tasks...</p> : <TaskList tasks={tasks} refreshTasks={fetchTasks} onEditTask={setEditingTask} />}
 
-      {editingTask && <EditTaskModal task={editingTask} isOpen={true} onClose={() => setEditingTask(null)} refreshTasks={fetchTasks} />}
+      {/* ✅ Modal for Editing Tasks */}
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          isOpen={true}
+          onClose={() => setEditingTask(null)}
+          refreshTasks={fetchTasks}
+        />
+      )}
     </div>
   );
 };
