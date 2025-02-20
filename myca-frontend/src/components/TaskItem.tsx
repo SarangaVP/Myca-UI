@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { FaEdit, FaPlus } from "react-icons/fa";
+import { FaEdit, FaPlus, FaStar } from "react-icons/fa";
 import TaskInput from "./TaskInput";
 
 interface Task {
   id: string;
   name: string;
+  isFocused?: boolean;
   children?: Task[];
 }
 
@@ -28,7 +29,11 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
           </button>
         )}
 
-        <span style={taskTextStyle}>{task.name}</span>
+        {/* Task Name with Star Icon for Focused Items */}
+        <span style={taskTextStyle}>
+          {task.name} 
+          {task.isFocused && <FaStar style={starIconStyle} />}
+        </span>
 
         {/* Add Child Task Button */}
         <button onClick={() => setIsAddingChild(!isAddingChild)} style={addButtonStyle}>
@@ -58,7 +63,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
   );
 };
 
-// 🔹 Styles
+// Styles
 const taskContainerStyle: React.CSSProperties = {
   padding: "12px",
   backgroundColor: "#fff",
@@ -83,6 +88,14 @@ const taskTextStyle: React.CSSProperties = {
   fontWeight: "bold",
   flex: 1,
   marginLeft: "8px",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+};
+
+const starIconStyle: React.CSSProperties = {
+  color: "#FFA500", 
+  marginLeft: "5px",
 };
 
 const toggleButtonStyle: React.CSSProperties = {
@@ -104,6 +117,7 @@ const addButtonStyle: React.CSSProperties = {
   alignItems: "center",
   gap: "5px",
   transition: "0.2s ease-in-out",
+  marginRight: "5px",
 };
 
 const editButtonStyle: React.CSSProperties = {

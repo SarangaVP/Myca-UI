@@ -10,14 +10,14 @@ interface EditTaskModalProps {
 
 const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, refreshTasks }) => {
   const [newName, setNewName] = useState(task.name);
-  const [newType, setNewType] = useState("task"); // Default value
+  const [newType, setNewType] = useState("task"); 
   const [newStatus, setNewStatus] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
   if (!isOpen) return null;
 
   const handleUpdateTask = () => {
-    const today = new Date().toISOString().split("T")[0]; // Format date
+    const today = new Date().toISOString().split("T")[0]; 
     const updateData = {
       date: today,
       item_id: task.id,
@@ -38,8 +38,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
     })
       .then((response) => response.json())
       .then(() => {
-        refreshTasks(); // Refresh task list after update
-        onClose(); // Close modal
+        refreshTasks(); 
+        onClose(); 
       })
       .catch((error) => console.error("Error updating task:", error));
   };
@@ -82,7 +82,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
   );
 };
 
-// 🔹 Missing Styles
+// Styles
 const modalOverlayStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,

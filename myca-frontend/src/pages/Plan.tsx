@@ -14,12 +14,11 @@ interface Task {
 const Plan: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingTask, setEditingTask] = useState<Task | null>(null); // Track task being edited
+  const [editingTask, setEditingTask] = useState<Task | null>(null); 
 
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
-  // 🔹 Fetch Tasks from API
   const fetchTasks = () => {
     setLoading(true);
     fetch(`${BASE_URL}/getItems`, {
@@ -37,6 +36,7 @@ const Plan: React.FC = () => {
           const rawTasks: Task[] = data.reports[0].map((item: any) => ({
             id: String(item.id),
             name: item.context.name,
+            isFocused: item.context.is_focused,
             parentId: item.context.parent_item_id || null,
           }));
 
@@ -74,13 +74,10 @@ const Plan: React.FC = () => {
       <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "5px" }}>Plan</h2>
       <p style={{ fontSize: "18px", color: "#666", marginBottom: "15px" }}>{displayDate}</p>
 
-      {/* ✅ Use `refreshTasks` Instead of `addTask` */}
       <TaskInput refreshTasks={fetchTasks} />
 
-      {/* ✅ Pass `refreshTasks` & `onEditTask` Correctly */}
       {loading ? <p>Loading tasks...</p> : <TaskList tasks={tasks} refreshTasks={fetchTasks} onEditTask={setEditingTask} />}
 
-      {/* ✅ Modal for Editing Tasks */}
       {editingTask && (
         <EditTaskModal
           task={editingTask}
