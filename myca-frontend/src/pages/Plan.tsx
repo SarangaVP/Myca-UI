@@ -22,7 +22,7 @@ const Plan: React.FC = () => {
   // 🔹 Fetch Tasks from API
   const fetchTasks = () => {
     setLoading(true);
-    fetch(`${BASE_URL}/getItemsForNodes`, {
+    fetch(`${BASE_URL}/getItems`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
