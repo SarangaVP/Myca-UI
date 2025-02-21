@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { FaEdit, FaPlus, FaStar, FaSyncAlt } from "react-icons/fa";
+import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote } from "react-icons/fa"; // Import FaStickyNote for the note icon
 import TaskInput from "./TaskInput";
-import RecurrenceModal from "./RecurrenceModal"; // Import Recurrence Modal
+import RecurrenceModal from "./RecurrenceModal";
+import NoteModal from "./NoteModal"; // Import Note Modal
 
 export interface Task {
   id: string;
   name: string;
   isFocused: boolean;
+  note?: string;
   children?: Task[];
 }
 
@@ -19,7 +21,8 @@ interface TaskItemProps {
 const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddingChild, setIsAddingChild] = useState(false);
-  const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false); // State for Recurrence Modal
+  const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false); // State for Note Modal
 
   return (
     <div style={taskContainerStyle}>
@@ -37,6 +40,11 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
           {task.isFocused && <FaStar style={starIconStyle} />}
         </span>
 
+        {/* Note Icon */}
+        <button onClick={() => setIsNoteModalOpen(true)} style={noteButtonStyle}>
+          <FaStickyNote /> 
+        </button>
+
         {/* Recurrence Icon */}
         <button onClick={() => setIsRecurrenceModalOpen(true)} style={recurrenceButtonStyle}>
           <FaSyncAlt /> 
@@ -49,7 +57,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
 
         {/* Edit Task Button */}
         <button onClick={() => onEditTask(task)} style={editButtonStyle}>
-          <FaEdit /> Edit
+          <FaEdit />
         </button>
       </div>
 
@@ -73,6 +81,16 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
           isOpen={isRecurrenceModalOpen} 
           onClose={() => setIsRecurrenceModalOpen(false)} 
           task={task} 
+        />
+      )}
+
+      {/* Note Modal */}
+      {isNoteModalOpen && (
+        <NoteModal
+          isOpen={isNoteModalOpen}
+          onClose={() => setIsNoteModalOpen(false)}
+          taskId={task.id}  // Pass taskId instead of task
+          refreshTasks={refreshTasks}
         />
       )}
     </div>
@@ -138,6 +156,20 @@ const addButtonStyle: React.CSSProperties = {
 
 const recurrenceButtonStyle: React.CSSProperties = {
   backgroundColor: "#17a2b8",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "5px",
+  border: "none",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+  transition: "0.2s ease-in-out",
+  marginRight: "5px",
+};
+
+const noteButtonStyle: React.CSSProperties = {
+  backgroundColor: "#ffc107",
   color: "white",
   padding: "6px 10px",
   borderRadius: "5px",
