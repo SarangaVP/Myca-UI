@@ -1,5 +1,13 @@
 const BASE_URL = "http://localhost:8000/walker";
+// const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjcxNDA3MTJkMjliMmVkMmU3YjI3NSIsImVtYWlsIjoiYWJjZEBnbWFpbC5jb20iLCJyb290X2lkIjoiNjdiNzE0MDcxMmQyOWIyZWQyZTdiMjc0IiwiaXNfYWN0aXZhdGVkIjp0cnVlLCJpc19hZG1pbiI6ZmFsc2UsImV4cGlyYXRpb24iOjE3NDAxNjU5NjQsInN0YXRlIjoiNEN6c29qSFUifQ.57L4xHiWXtk7Xl7lbWZnnkliTgX_IgRxBLgKdUNkkwU"; 
+// export { BASE_URL, AUTH_TOKEN };
 
-const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YjVkMzFmOWVhYzA3N2MxODg0ZmUzYiIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsInJvb3RfaWQiOiI2N2I1ZDMxZTllYWMwNzdjMTg4NGZlM2EiLCJpc19hY3RpdmF0ZWQiOnRydWUsImlzX2FkbWluIjpmYWxzZSwiZXhwaXJhdGlvbiI6MTc0MDAxMjUxNCwic3RhdGUiOiJGMVIwZjd6MSJ9.umNsiaZ3N_VTJdpkwLk8mFQBldy2_KlGeHWt92OVtSE"; 
 
-export { BASE_URL, AUTH_TOKEN };
+
+// // config.ts
+// const BASE_URL = "http://localhost:8000/walker";
+
+// export const getAuthToken = () => {
+//   return localStorage.getItem("token") || "";
+// };
+export { BASE_URL };

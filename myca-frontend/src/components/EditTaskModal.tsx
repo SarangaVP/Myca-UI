@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { BASE_URL, AUTH_TOKEN } from "../config";
+// import { BASE_URL, AUTH_TOKEN } from "../config";
+import { BASE_URL } from "../config";
+
 
 interface EditTaskModalProps {
   task: { id: string; name: string };
@@ -18,6 +20,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
 
   const handleUpdateTask = () => {
     const today = new Date().toISOString().split("T")[0]; // Format date
+    const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     const updateData = {
       date: today,
       item_id: task.id,
