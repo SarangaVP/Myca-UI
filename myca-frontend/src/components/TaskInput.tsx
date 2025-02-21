@@ -28,11 +28,11 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
     }
 
     const requestBody = {
-      date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD
+      date: new Date().toISOString().split("T")[0], 
       item_name: taskName,
       item_type: taskType,
       item_status: "running",
-      parent_item_id: parentId, // Assign parent ID
+      parent_item_id: parentId, 
       note: "",
     };
 
@@ -52,8 +52,8 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
       if (response.ok && data.status === 200) {
         setTaskName("");
         setTaskType("task");
-        refreshTasks(); // Refresh task list
-        if (onClose) onClose(); // Close input after adding
+        refreshTasks(); 
+        if (onClose) onClose(); 
       } else {
         throw new Error(data.message || "Failed to add task");
       }

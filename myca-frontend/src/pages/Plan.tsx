@@ -7,6 +7,7 @@ import { BASE_URL } from "../config";
 interface Task {
   id: string;
   name: string;
+  isFocused: boolean; 
   parentId?: string;
   children?: Task[];
 }
@@ -14,13 +15,14 @@ interface Task {
 const Plan: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [editingTask, setEditingTask] = useState<Task | null>(null); // Track task being edited
   const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem("AUTH_TOKEN"));
+
 
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
-  // 🔹 Fetch Tasks from API
   const fetchTasks = () => {
     const token = localStorage.getItem("AUTH_TOKEN"); // Ensure we get the latest token
     if (!token) {
@@ -49,6 +51,7 @@ const Plan: React.FC = () => {
           const rawTasks: Task[] = data.reports[0].map((item: any) => ({
             id: String(item.id),
             name: item.context.name,
+            isFocused: item.context.is_focused || false, 
             parentId: item.context.parent_item_id || null,
           }));
 

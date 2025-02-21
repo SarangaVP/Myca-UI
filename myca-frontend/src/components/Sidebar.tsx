@@ -115,7 +115,6 @@ const Sidebar: React.FC = () => {
   );
 };
 
-// 🔹 Styling Constants
 const sidebarStyle: CSSProperties = {
   width: "250px",
   backgroundColor: "#f8f9fa",

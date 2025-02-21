@@ -1,10 +1,21 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
+
 // import { BASE_URL, AUTH_TOKEN } from "../config";
 import { BASE_URL } from "../config";
 
 
 interface EditTaskModalProps {
-  task: { id: string; name: string };
+  task: { 
+    id: string; 
+    name: string;
+    isFocused: boolean; 
+    context?: {
+      name: string;
+      itype: string;
+      status: string;
+    };
+  };
   isOpen: boolean;
   onClose: () => void;
   refreshTasks: () => void;
@@ -12,22 +23,31 @@ interface EditTaskModalProps {
 
 const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, refreshTasks }) => {
   const [newName, setNewName] = useState(task.name);
-  const [newType, setNewType] = useState("task"); // Default value
-  const [newStatus, setNewStatus] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+  const [newType, setNewType] = useState(task.context?.itype || "");
+  const [newStatus, setNewStatus] = useState(task.context?.status || "");
+  const [isFocused, setIsFocused] = useState(task.isFocused || false); 
+
+  useEffect(() => {
+    setNewName(task.name);
+    setNewType(task.context?.itype || "");
+    setNewStatus(task.context?.status || "");
+    setIsFocused(task.isFocused || false); 
+  }, [task]);
 
   if (!isOpen) return null;
 
   const handleUpdateTask = () => {
+
     const today = new Date().toISOString().split("T")[0]; // Format date
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
+
     const updateData = {
       date: today,
       item_id: task.id,
       new_name: newName,
-      new_type: newType, 
+      new_type: newType,
       new_status: newStatus,
-      isFocused: isFocused,
+      isFocused: isFocused, 
     };
 
     fetch(`${BASE_URL}/updateItem`, {
@@ -41,8 +61,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
     })
       .then((response) => response.json())
       .then(() => {
-        refreshTasks(); // Refresh task list after update
-        onClose(); // Close modal
+        refreshTasks(); 
+        onClose(); 
       })
       .catch((error) => console.error("Error updating task:", error));
   };
@@ -53,10 +73,20 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
         <h2>Edit Task</h2>
 
         <label>Task Name:</label>
-        <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} style={inputStyle} />
+        <input 
+          type="text" 
+          value={newName} 
+          onChange={(e) => setNewName(e.target.value)} 
+          style={inputStyle} 
+        />
 
         <label>Type:</label>
-        <select value={newType} onChange={(e) => setNewType(e.target.value)} style={inputStyle}>
+        <select 
+          value={newType} 
+          onChange={(e) => setNewType(e.target.value)} 
+          style={inputStyle}
+        >
+          <option value="">Select Type</option>
           <option value="task">Task</option>
           <option value="note">Note</option>
           <option value="group">Group</option>
@@ -64,17 +94,26 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
         </select>
 
         <label>Status:</label>
-        <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)} style={inputStyle}>
+        <select 
+          value={newStatus} 
+          onChange={(e) => setNewStatus(e.target.value)} 
+          style={inputStyle}
+        >
           <option value="">Select Status</option>
-          <option value="inprogress">In Progress</option>
+          <option value="running">Running</option>
           <option value="completed">Completed</option>
-          <option value="cancled">Cancled</option>
+          <option value="canceled">Canceled</option>
         </select>
 
-        <label>
-          <input type="checkbox" checked={isFocused} onChange={(e) => setIsFocused(e.target.checked)} />
-          Focused
-        </label>
+        <div style={{ marginTop: "10px" }}>
+          <input 
+            type="checkbox" 
+            checked={isFocused} 
+            onChange={(e) => setIsFocused(e.target.checked)} 
+            id="focus-checkbox"
+          />
+          <label htmlFor="focus-checkbox" style={{ marginLeft: "5px" }}> Focused</label>
+        </div>
 
         <div style={buttonContainerStyle}>
           <button onClick={handleUpdateTask} style={saveButtonStyle}>Save</button>
@@ -85,7 +124,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
   );
 };
 
-// 🔹 Missing Styles
+// Styles
 const modalOverlayStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,
