@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { BASE_URL, AUTH_TOKEN } from "../config.ts";
+// import { BASE_URL, AUTH_TOKEN } from "../config.ts";
+import { BASE_URL } from "../config";
 
 const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose?: () => void }> = ({
   refreshTasks,
@@ -17,6 +18,15 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
     setLoading(true);
     setError(null);
 
+    const token = localStorage.getItem("AUTH_TOKEN"); // Fetch token dynamically
+    console.log("Stored AUTH_TOKEN:", token); // Debugging log
+
+    if (!token) {
+      setError("Authentication token is missing. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
     const requestBody = {
       date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD
       item_name: taskName,
@@ -31,12 +41,13 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${AUTH_TOKEN}`,
+          Authorization: `Bearer ${token}`, // Use dynamically fetched token
         },
         body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
+      console.log("Task creation response:", data); // Debugging log
 
       if (response.ok && data.status === 200) {
         setTaskName("");
@@ -44,7 +55,7 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
         refreshTasks(); // Refresh task list
         if (onClose) onClose(); // Close input after adding
       } else {
-        throw new Error("Failed to add task");
+        throw new Error(data.message || "Failed to add task");
       }
     } catch (err) {
       setError("Error adding task. Please try again.");
