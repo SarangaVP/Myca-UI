@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Task } from "./TaskItem";
+import { BASE_URL, AUTH_TOKEN } from "../config";
 
 interface RecurrenceModalProps {
   isOpen: boolean;
@@ -7,34 +8,109 @@ interface RecurrenceModalProps {
   task: Task;
 }
 
-const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose }) => {
+const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task }) => {
   const [repeatEvery, setRepeatEvery] = useState(1);
-  const [repeatUnit, setRepeatUnit] = useState("Days");
+  const [repeatUnit, setRepeatUnit] = useState("DAYS");
   const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
-  const [endOption, setEndOption] = useState("never");
   const [endDate, setEndDate] = useState("");
-  const [occurrences, setOccurrences] = useState(1);
+  const [occurrences, setOccurrences] = useState(0);
   const [isRitual, setIsRitual] = useState(false);
 
-  if (!isOpen) return null;
+  // Change: Use Boolean Array for Days of Week
+  const [byDayOfWeek, setByDayOfWeek] = useState<boolean[]>([false, false, false, false, false, false, false]);
+  const [byDayOfMonth, setByDayOfMonth] = useState(1);
 
-  const handleSave = () => { // for checking
-    console.log({
-      repeatEvery,
-      repeatUnit,
-      startDate,
-      endOption,
-      endDate,
-      occurrences,
-      isRitual,
-    });
-    onClose();
+  // Change: Load Existing Data as Boolean Array
+  useEffect(() => {
+    const fetchRecurrence = async () => {
+      if (isOpen) {
+        try {
+          const response = await fetch(`${BASE_URL}/getItems`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${AUTH_TOKEN}`,
+            },
+            body: JSON.stringify({
+              date_input: new Date().toISOString().split("T")[0],
+              items_list: [],
+            }),
+          });
+          const data = await response.json();
+          if (data.status === 200 && data.reports.length > 0) {
+            const matchedItem = data.reports[0].find((item: any) => item.id === task.id);
+            const ritual = matchedItem?.context?.ritual;
+            if (ritual) {
+              setRepeatUnit(ritual.frequency || "DAYS");
+              setRepeatEvery(ritual.interval || 1);
+              setStartDate(ritual.start || new Date().toISOString().split("T")[0]);
+              setEndDate(ritual.end || "");
+              setByDayOfMonth(ritual.by_day_of_month || 1);
+              setIsRitual(ritual.ritual_flag || false);
+
+              // Change: Convert string array to boolean array for byDayOfWeek
+              const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+              const selectedDays = ritual.by_day_of_week || [];
+              const booleanArray = daysOfWeek.map((day) => selectedDays.includes(day));
+              setByDayOfWeek(booleanArray);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load recurrence:", error);
+        }
+      }
+    };
+    fetchRecurrence();
+  }, [isOpen, task.id]);
+
+  // Change: Send Boolean Array Directly to API
+  const handleSave = async () => {
+    const requestBody = {
+      date: new Date().toISOString().split("T")[0],
+      item_id: task.id,
+      start: startDate,
+      end: endDate,
+      frequency: repeatUnit,
+      ritual_flag: isRitual,
+      by_day_of_week: byDayOfWeek,
+      by_day_of_month: byDayOfMonth,
+      occurence: occurrences,
+      interval: repeatEvery,
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/setUpRecurrence`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${AUTH_TOKEN}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+      if (data.status === 200) {
+        onClose();
+      } else {
+        console.error("Failed to save recurrence");
+      }
+    } catch (error) {
+      console.error("Error saving recurrence:", error);
+    }
+  };
+
+  // Change: Toggle Boolean Array for Day Selection
+  const toggleDayOfWeek = (index: number) => {
+    setByDayOfWeek((prevDays) =>
+      prevDays.map((selected, i) => (i === index ? !selected : selected))
+    );
   };
 
   return (
     <div style={modalOverlayStyle}>
       <div style={modalContentStyle}>
-        <h2>Recurrence</h2>
+        <h2 style={modalTitleStyle}>Recurrence</h2>
+
         <label>Repeat every:</label>
         <div style={inlineStyle}>
           <input
@@ -44,19 +120,33 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose }) =>
             min={1}
             style={inputStyle}
           />
-          <select value={repeatUnit} onChange={(e) => setRepeatUnit(e.target.value)} style={inputStyle}>
-            <option value="Days">Days</option>
-            <option value="Weeks">Weeks</option>
-            <option value="Months">Months</option>
+          <select
+            value={repeatUnit}
+            onChange={(e) => setRepeatUnit(e.target.value)}
+            style={inputStyle}
+          >
+            <option value="DAYS">Days</option>
+            <option value="WEEKS">Weeks</option>
+            <option value="MONTHS">Months</option>
           </select>
         </div>
 
-        {repeatUnit === "Weeks" && (
+        {repeatUnit === "WEEKS" && (
           <div>
             <label>On:</label>
             <div style={inlineStyle}>
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <button key={day} style={dayButtonStyle}>
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => (
+                <button
+                  key={day}
+                  onClick={() => toggleDayOfWeek(index)}
+                  style={{
+                    ...dayButtonStyle,
+                    backgroundColor: byDayOfWeek[index] ? "#007bff" : "#f8f9fa",
+                    color: byDayOfWeek[index] ? "white" : "black",
+                    border: byDayOfWeek[index] ? "2px solid #0056b3" : "1px solid #ccc",
+                    transition: "all 0.2s ease-in-out"
+                  }}
+                >
                   {day}
                 </button>
               ))}
@@ -64,15 +154,20 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose }) =>
           </div>
         )}
 
-        {repeatUnit === "Months" && (
+        {repeatUnit === "MONTHS" && (
           <div>
             <label>On the:</label>
-            <select style={inputStyle}>
+            <select
+              value={byDayOfMonth}
+              onChange={(e) => setByDayOfMonth(Number(e.target.value))}
+              style={inputStyle}
+            >
               {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                <option key={day} value={day}>{day}</option>
+                <option key={day} value={day}>
+                  {day}
+                </option>
               ))}
             </select>
-            of the month
           </div>
         )}
 
@@ -85,48 +180,20 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose }) =>
         />
 
         <label>Ends:</label>
-        <div>
-          <input
-            type="radio"
-            checked={endOption === "never"}
-            onChange={() => setEndOption("never")}
-          /> Never
-          <input
-            type="radio"
-            checked={endOption === "on"}
-            onChange={() => setEndOption("on")}
-            style={{ marginLeft: "10px" }}
-          /> On
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            disabled={endOption !== "on"}
-            style={{ marginLeft: "10px" }}
-          />
-          <input
-            type="radio"
-            checked={endOption === "after"}
-            onChange={() => setEndOption("after")}
-            style={{ marginLeft: "10px" }}
-          /> After
-          <input
-            type="number"
-            value={occurrences}
-            onChange={(e) => setOccurrences(Number(e.target.value))}
-            disabled={endOption !== "after"}
-            min={1}
-            style={{ marginLeft: "10px" }}
-          /> occurrences
-        </div>
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          style={inputStyle}
+        />
 
-        <label>
-          <input
-            type="checkbox"
-            checked={isRitual}
-            onChange={(e) => setIsRitual(e.target.checked)}
-          /> Ritual
-        </label>
+        <label>Ritual:</label>
+        <input
+          type="checkbox"
+          checked={isRitual}
+          onChange={(e) => setIsRitual(e.target.checked)}
+          style={{ marginLeft: "10px" }}
+        />
 
         <div style={buttonContainerStyle}>
           <button onClick={onClose} style={cancelButtonStyle}>Cancel</button>
@@ -137,35 +204,9 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose }) =>
   );
 };
 
+
+
 // Styles
-const modalOverlayStyle: React.CSSProperties = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 1000,
-};
-
-const modalContentStyle: React.CSSProperties = {
-  backgroundColor: "white",
-  padding: "20px",
-  borderRadius: "8px",
-  width: "400px",
-  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-};
-
-const inputStyle: React.CSSProperties = {
-  padding: "8px",
-  margin: "5px 0",
-  borderRadius: "4px",
-  border: "1px solid #ccc",
-};
-
 const inlineStyle: React.CSSProperties = {
   display: "flex",
   gap: "10px",
@@ -203,5 +244,46 @@ const cancelButtonStyle: React.CSSProperties = {
   border: "none",
   cursor: "pointer",
 };
+
+// Modal Styles
+const modalOverlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+};
+
+const modalContentStyle: React.CSSProperties = {
+  backgroundColor: "white",
+  padding: "20px",
+  borderRadius: "8px",
+  width: "400px",
+  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+};
+
+const modalTitleStyle: React.CSSProperties = {
+  fontSize: "24px",
+  fontWeight: "bold",
+  marginBottom: "15px",
+  textAlign: "center",
+  color: "#333",
+};
+
+// Input Styles
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "8px",
+  margin: "5px 0",
+  borderRadius: "4px",
+  border: "1px solid #ccc",
+  boxSizing: "border-box",
+};
+
 
 export default RecurrenceModal;
