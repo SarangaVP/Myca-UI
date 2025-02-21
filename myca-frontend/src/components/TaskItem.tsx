@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { FaEdit, FaPlus, FaStar } from "react-icons/fa";
+import { FaEdit, FaPlus, FaStar, FaSyncAlt } from "react-icons/fa";
 import TaskInput from "./TaskInput";
+import RecurrenceModal from "./RecurrenceModal"; // Import Recurrence Modal
 
-interface Task {
+export interface Task {
   id: string;
   name: string;
-  isFocused?: boolean;
+  isFocused: boolean;
   children?: Task[];
 }
 
@@ -18,6 +19,7 @@ interface TaskItemProps {
 const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddingChild, setIsAddingChild] = useState(false);
+  const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false); // State for Recurrence Modal
 
   return (
     <div style={taskContainerStyle}>
@@ -34,6 +36,11 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
           {task.name} 
           {task.isFocused && <FaStar style={starIconStyle} />}
         </span>
+
+        {/* Recurrence Icon */}
+        <button onClick={() => setIsRecurrenceModalOpen(true)} style={recurrenceButtonStyle}>
+          <FaSyncAlt /> 
+        </button>
 
         {/* Add Child Task Button */}
         <button onClick={() => setIsAddingChild(!isAddingChild)} style={addButtonStyle}>
@@ -58,6 +65,15 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
             <TaskItem key={child.id} task={child} refreshTasks={refreshTasks} onEditTask={onEditTask} />
           ))}
         </div>
+      )}
+
+      {/* Recurrence Modal */}
+      {isRecurrenceModalOpen && (
+        <RecurrenceModal 
+          isOpen={isRecurrenceModalOpen} 
+          onClose={() => setIsRecurrenceModalOpen(false)} 
+          task={task} 
+        />
       )}
     </div>
   );
@@ -108,6 +124,20 @@ const toggleButtonStyle: React.CSSProperties = {
 
 const addButtonStyle: React.CSSProperties = {
   backgroundColor: "#28a745",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "5px",
+  border: "none",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+  transition: "0.2s ease-in-out",
+  marginRight: "5px",
+};
+
+const recurrenceButtonStyle: React.CSSProperties = {
+  backgroundColor: "#17a2b8",
   color: "white",
   padding: "6px 10px",
   borderRadius: "5px",

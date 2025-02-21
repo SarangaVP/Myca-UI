@@ -4,6 +4,7 @@ import TaskItem from "./TaskItem";
 interface Task {
   id: string;
   name: string;
+  isFocused: boolean;
   children?: Task[];
 }
 
@@ -23,7 +24,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask, refreshTasks }) 
   );
 };
 
-// 🔹 Styles
+// Styles
 const taskListContainerStyle: React.CSSProperties = {
   marginTop: "20px",
   backgroundColor: "#fff",

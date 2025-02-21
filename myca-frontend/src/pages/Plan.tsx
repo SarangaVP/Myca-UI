@@ -7,6 +7,7 @@ import { BASE_URL, AUTH_TOKEN } from "../config";
 interface Task {
   id: string;
   name: string;
+  isFocused: boolean; 
   parentId?: string;
   children?: Task[];
 }
@@ -36,7 +37,7 @@ const Plan: React.FC = () => {
           const rawTasks: Task[] = data.reports[0].map((item: any) => ({
             id: String(item.id),
             name: item.context.name,
-            isFocused: item.context.is_focused,
+            isFocused: item.context.is_focused || false, 
             parentId: item.context.parent_item_id || null,
           }));
 
