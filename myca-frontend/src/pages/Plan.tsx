@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import TaskInput from "../components/TaskInput";
 import TaskList from "../components/TaskList";
 import EditTaskModal from "../components/EditTaskModal";
-import { BASE_URL, AUTH_TOKEN } from "../config";
+import { BASE_URL } from "../config";
 
 interface Task {
   id: string;
@@ -15,23 +15,37 @@ interface Task {
 const Plan: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingTask, setEditingTask] = useState<Task | null>(null); 
+
+  const [editingTask, setEditingTask] = useState<Task | null>(null); // Track task being edited
+  const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem("AUTH_TOKEN"));
+
 
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
   const fetchTasks = () => {
+    const token = localStorage.getItem("AUTH_TOKEN"); // Ensure we get the latest token
+    if (!token) {
+      console.warn("AUTH_TOKEN not available, skipping fetch.");
+      return;
+    }
+
     setLoading(true);
     fetch(`${BASE_URL}/getItems`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${AUTH_TOKEN}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
       body: JSON.stringify({ date_input: formattedDate, items_list: [] }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => {
         if (data.status === 200 && data.reports.length > 0) {
           const rawTasks: Task[] = data.reports[0].map((item: any) => ({
@@ -61,8 +75,24 @@ const Plan: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (authToken) {
+      fetchTasks();
+    } else {
+      // Watch for changes in localStorage and re-run fetchTasks when the token is set
+      const interval = setInterval(() => {
+        const newToken = localStorage.getItem("AUTH_TOKEN");
+        if (newToken) {
+          setAuthToken(newToken);
+          clearInterval(interval);
+        }
+      }, 500); // Check every 500ms
+      return () => clearInterval(interval);
+    }
+  }, [authToken]);
+
+  useEffect(() => {
+    console.log("Tasks updated:", tasks);
+  }, [tasks]);
 
   const displayDate = today.toLocaleDateString("en-US", {
     weekday: "long",
