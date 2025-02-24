@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { BASE_URL, AUTH_TOKEN } from "../config";
+// import { BASE_URL, AUTH_TOKEN } from "../config";
+import { BASE_URL} from "../config";
+
 
 interface NoteModalProps {
   isOpen: boolean;
@@ -15,6 +17,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, taskId, refreshT
 
   useEffect(() => {
     const fetchNote = async () => {
+    const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
       if (isOpen) {
         setLoading(true);
         try {
@@ -51,6 +54,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ isOpen, onClose, taskId, refreshT
   }, [isOpen, taskId]);
 
   const handleSave = async () => {
+    const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     try {
       const response = await fetch(`${BASE_URL}/openNote`, {
         method: "POST",

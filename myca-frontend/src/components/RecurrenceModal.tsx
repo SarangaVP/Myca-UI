@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Task } from "./TaskItem";
-import { BASE_URL, AUTH_TOKEN } from "../config";
+// import { BASE_URL, AUTH_TOKEN } from "../config";
+import { BASE_URL} from "../config";
+
 
 interface RecurrenceModalProps {
   isOpen: boolean;
@@ -23,6 +25,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
   // Change: Load Existing Data as Boolean Array
   useEffect(() => {
     const fetchRecurrence = async () => {
+      const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
       if (isOpen) {
         try {
           const response = await fetch(`${BASE_URL}/getItems`, {
@@ -49,10 +52,12 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
               setIsRitual(ritual.ritual_flag || false);
 
               // Change: Convert string array to boolean array for byDayOfWeek
-              const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+              //const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
               const selectedDays = ritual.by_day_of_week || [];
-              const booleanArray = daysOfWeek.map((day) => selectedDays.includes(day));
-              setByDayOfWeek(booleanArray);
+              //console.log("Selected Days:", selectedDays); 
+              //const booleanArray = daysOfWeek.map((day) => selectedDays.includes(day));
+              //console.log("Preloaded byDayOfWeek:", booleanArray);
+              setByDayOfWeek(selectedDays);
             }
           }
         } catch (error) {
@@ -77,6 +82,8 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
       occurence: occurrences,
       interval: repeatEvery,
     };
+
+    const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN"); //check
 
     try {
       const response = await fetch(`${BASE_URL}/setUpRecurrence`, {
@@ -136,6 +143,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
             <label>On:</label>
             <div style={inlineStyle}>
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => (
+                //console.log(`${day} button state:`, byDayOfWeek[index]),
                 <button
                   key={day}
                   onClick={() => toggleDayOfWeek(index)}
