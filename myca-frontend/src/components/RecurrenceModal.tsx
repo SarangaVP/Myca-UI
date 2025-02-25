@@ -92,7 +92,6 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
     fetchRecurrence();
   }, [isOpen, task.id]);
 
-  // Change: Send Boolean Array Directly to API
   const handleSave = async () => {
     // const requestBody = {
     //   date: new Date().toISOString().split("T")[0],
@@ -131,7 +130,6 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
       } else if (endType === "NEVER") {
         requestBody.occurrence = 0;
         requestBody.end = "";
-        // Do NOT set occurrence for NEVER
       }
       console.log("Request Body:", requestBody);
 
@@ -158,7 +156,6 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
     }
   };
 
-  // Change: Toggle Boolean Array for Day Selection
   const toggleDayOfWeek = (index: number) => {
     setByDayOfWeek((prevDays) =>
       prevDays.map((selected, i) => (i === index ? !selected : selected))

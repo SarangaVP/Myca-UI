@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote } from "react-icons/fa"; // Import FaStickyNote for the note icon
+import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote } from "react-icons/fa"; 
 import TaskInput from "./TaskInput";
 import RecurrenceModal from "./RecurrenceModal";
-import NoteModal from "./NoteModal"; // Import Note Modal
+import NoteModal from "./NoteModal"; 
 
 export interface Task {
   id: string;
@@ -22,7 +22,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
-  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false); // State for Note Modal
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false); 
 
   return (
     <div style={taskContainerStyle}>
@@ -89,7 +89,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
         <NoteModal
           isOpen={isNoteModalOpen}
           onClose={() => setIsNoteModalOpen(false)}
-          taskId={task.id}  // Pass taskId instead of task
+          taskId={task.id}  
           refreshTasks={refreshTasks}
         />
       )}

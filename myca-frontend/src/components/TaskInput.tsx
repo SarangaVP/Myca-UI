@@ -18,8 +18,8 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
     setLoading(true);
     setError(null);
 
-    const token = localStorage.getItem("AUTH_TOKEN"); // Fetch token dynamically
-    console.log("Stored AUTH_TOKEN:", token); // Debugging log
+    const token = localStorage.getItem("AUTH_TOKEN"); 
+    console.log("Stored AUTH_TOKEN:", token); 
 
     if (!token) {
       setError("Authentication token is missing. Please log in again.");
@@ -41,13 +41,13 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Use dynamically fetched token
+          Authorization: `Bearer ${token}`, 
         },
         body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
-      console.log("Task creation response:", data); // Debugging log
+      console.log("Task creation response:", data); 
 
       if (response.ok && data.status === 200) {
         setTaskName("");
