@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Task } from "./TaskItem";
-import { BASE_URL, AUTH_TOKEN } from "../config";
+// import { BASE_URL, AUTH_TOKEN } from "../config";
+import { BASE_URL } from "../config";
 
 interface RecurrenceModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
     const fetchRecurrence = async () => {
       if (isOpen) {
         try {
+          const AUTH_TOKEN = localStorage.getItem("authToken");
           const response = await fetch(`${BASE_URL}/getItems`, {
             method: "POST",
             headers: {
@@ -79,6 +81,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
     };
 
     try {
+      const AUTH_TOKEN = localStorage.getItem("authToken");
       const response = await fetch(`${BASE_URL}/setUpRecurrence`, {
         method: "POST",
         headers: {
