@@ -6,6 +6,7 @@ import NoteModal from "./NoteModal";
 import { BASE_URL } from "../config";
 
 export interface Task {
+  context: any;
   id: string;
   name: string;
   isFocused: boolean;
@@ -36,7 +37,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
 
   // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
-    e.stopPropagation(); // Add this line
+    e.stopPropagation(); 
     e.dataTransfer.setData("text/plain", itemId);
     e.dataTransfer.effectAllowed = "move";
     console.log("Setting Dragging Item:", itemId);
@@ -162,7 +163,12 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
       {/* {isExpanded && task.children && (
         <div style={childTaskContainerStyle}>
           {task.children.map((child) => (
-            <TaskItem key={child.id} task={child} refreshTasks={refreshTasks} onEditTask={onEditTask} />
+            <TaskItem
+              key={child.id}
+              task={child}
+              refreshTasks={refreshTasks}
+              onEditTask={onEditTask}
+            />
           ))}
         </div>
       )} */}
@@ -239,7 +245,7 @@ const taskTextStyle: React.CSSProperties = {
 };
 
 const starIconStyle: React.CSSProperties = {
-  color: "#FFA500", 
+  color: "#FFA500",
   marginLeft: "5px",
 };
 
