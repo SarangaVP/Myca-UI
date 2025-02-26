@@ -1,8 +1,10 @@
+// src/pages/RegisterPage.tsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser, RegisterData } from "../api/auth";
+import authorImg from "../assets/author-img.png"; // Ensure this matches the testimonial background
+import mycaLogo from "../assets/myca_logo.svg"; // Add a logo file if available
 import "./RegisterPage.css";
-import authorImg from "../assets/author-img.png"; // Adjust path based on folder structure
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -44,8 +46,7 @@ const RegisterPage: React.FC = () => {
         password,
         confirmPassword,
       } as RegisterData);
-      
-    localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.token);
       navigate("/login");
     } catch (err: any) {
       setError(err.message || "Registration failed");
@@ -74,7 +75,7 @@ const RegisterPage: React.FC = () => {
             <div className="testimonial-author">
               <img
                 src="https://via.placeholder.com/60"
-                alt="Author"
+                alt="Ray Hale"
                 className="author-image"
               />
               <div>
@@ -87,7 +88,7 @@ const RegisterPage: React.FC = () => {
       </div>
       <div className="register-form-section">
         <div className="register-form-wrapper">
-          <h1>myca</h1>
+          <img src={mycaLogo} alt="Myca Logo" className="myca-logo" /> {/* Add logo */}
           {error && <p style={{ color: "red" }}>{error}</p>}
           <form onSubmit={handleRegister}>
             <div className="form-group">
@@ -144,7 +145,6 @@ const RegisterPage: React.FC = () => {
               />
               <label htmlFor="robotCheck">I'm not a robot</label>
             </div>
-
             <button
               type="submit"
               className="primary-button"
@@ -153,12 +153,10 @@ const RegisterPage: React.FC = () => {
               {isLoading ? "Signing Up..." : "Sign up with email"}
             </button>
           </form>
-
           <div className="social-register">
             <button className="apple-button">Sign up with Apple</button>
             <button className="google-button">Sign up with Google</button>
           </div>
-
           <div className="login-redirect">
             Already have an account? <Link to="/login">Login here</Link>
           </div>
@@ -169,6 +167,3 @@ const RegisterPage: React.FC = () => {
 };
 
 export default RegisterPage;
-
-
-

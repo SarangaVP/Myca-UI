@@ -1,8 +1,10 @@
+
 // src/pages/LoginPage.tsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../api/auth";
-import loginImage from "../assets/login-img.png"; // Import the image
+import loginImage from "../assets/login-img.png"; // Ensure this matches the scenic image
+import mycaLogo from "../assets/myca_logo.svg"; // Ensure this path is correct
 import "./LoginPage.css";
 
 const LoginPage: React.FC = () => {
@@ -16,7 +18,6 @@ const LoginPage: React.FC = () => {
     setError("");
     try {
       const data = await loginUser({ email, password });
-      // localStorage.setItem("token", data.token);
       localStorage.setItem("AUTH_TOKEN", data.token);
       navigate("/plan");
     } catch (err: any) {
@@ -27,11 +28,16 @@ const LoginPage: React.FC = () => {
   return (
     <div className="login-container">
       <div className="login-image-section">
-        <img src={loginImage} alt="Scenic" className="login-image" /> {/* Use imported variable */}
+        <img src={loginImage} alt="Scenic" className="login-image" />
       </div>
       <div className="login-form-section">
         <div className="login-form-wrapper">
-          <h1>myca</h1>
+          {/* Add fallback text if the logo fails to load */}
+          {mycaLogo ? (
+            <img src={mycaLogo} alt="Myca Logo" className="myca-logo" />
+          ) : (
+            <h1 className="myca-text">myca</h1> // Fallback text
+          )}
           {error && <p style={{ color: "red" }}>{error}</p>}
           <form onSubmit={handleLogin}>
             <div className="form-group">
@@ -75,8 +81,3 @@ const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
-
-
-
-
-
