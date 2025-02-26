@@ -43,7 +43,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
       const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
       if (isOpen) {
         try {
-          const AUTH_TOKEN = localStorage.getItem("authToken");
+         
           const response = await fetch(`${BASE_URL}/getItems`, {
             method: "POST",
             headers: {
@@ -69,7 +69,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
 
               // Change: Convert string array to boolean array for byDayOfWeek
               //const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-              const selectedDays = ritual.by_day_of_week || [];
+              const selectedDays = ritual.by_day_of_week || [false, false, false, false, false, false, false];
               //console.log("Selected Days:", selectedDays); 
               //const booleanArray = daysOfWeek.map((day) => selectedDays.includes(day));
               //console.log("Preloaded byDayOfWeek:", booleanArray);
@@ -137,7 +137,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN"); //check
 
     try {
-      const AUTH_TOKEN = localStorage.getItem("authToken");
+      
       const response = await fetch(`${BASE_URL}/setUpRecurrence`, {
         method: "POST",
         headers: {
