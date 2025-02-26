@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Task } from "./TaskItem";
 // import { BASE_URL, AUTH_TOKEN } from "../config";
-import { BASE_URL } from "../config";
+
+import { BASE_URL} from "../config";
 
 interface RecurrenceModalProps {
   isOpen: boolean;
   onClose: () => void;
   task: Task;
 }
+
+// interface RecurrenceRequestBody {
+//   date: string;
+//   item_id: string;
+//   start: string;
+//   frequency: string;
+//   ritual_flag: boolean;
+//   by_day_of_week: boolean[];
+//   by_day_of_month: number;
+//   interval: number;
+//   end: string | null; // Allow end to be either string or null
+//   occurrence?: number; // Optional occurrence
+// }
 
 const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task }) => {
   const [repeatEvery, setRepeatEvery] = useState(1);
@@ -21,9 +35,12 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
   const [byDayOfWeek, setByDayOfWeek] = useState<boolean[]>([false, false, false, false, false, false, false]);
   const [byDayOfMonth, setByDayOfMonth] = useState(1);
 
+  const [endType, setEndType] = useState("NEVER"); // ON, AFTER, NEVER
+
   // Change: Load Existing Data as Boolean Array
   useEffect(() => {
     const fetchRecurrence = async () => {
+      const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
       if (isOpen) {
         try {
           const AUTH_TOKEN = localStorage.getItem("authToken");
@@ -51,10 +68,21 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
               setIsRitual(ritual.ritual_flag || false);
 
               // Change: Convert string array to boolean array for byDayOfWeek
-              const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+              //const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
               const selectedDays = ritual.by_day_of_week || [];
-              const booleanArray = daysOfWeek.map((day) => selectedDays.includes(day));
-              setByDayOfWeek(booleanArray);
+              //console.log("Selected Days:", selectedDays); 
+              //const booleanArray = daysOfWeek.map((day) => selectedDays.includes(day));
+              //console.log("Preloaded byDayOfWeek:", booleanArray);
+              setByDayOfWeek(selectedDays);
+              if (ritual.end) {
+                setEndType("ON");
+                setEndDate(ritual.end);
+              } else if (ritual.occurrence) {
+                setEndType("AFTER");
+                setOccurrences(ritual.occurrence);
+              } else {
+                setEndType("NEVER");
+              }
             }
           }
         } catch (error) {
@@ -65,20 +93,48 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
     fetchRecurrence();
   }, [isOpen, task.id]);
 
-  // Change: Send Boolean Array Directly to API
   const handleSave = async () => {
-    const requestBody = {
-      date: new Date().toISOString().split("T")[0],
-      item_id: task.id,
-      start: startDate,
-      end: endDate,
-      frequency: repeatUnit,
-      ritual_flag: isRitual,
-      by_day_of_week: byDayOfWeek,
-      by_day_of_month: byDayOfMonth,
-      occurence: occurrences,
-      interval: repeatEvery,
-    };
+    // const requestBody = {
+    //   date: new Date().toISOString().split("T")[0],
+    //   item_id: task.id,
+    //   start: startDate,
+    //   end: endDate,
+    //   frequency: repeatUnit,
+    //   ritual_flag: isRitual,
+    //   by_day_of_week: byDayOfWeek,
+    //   by_day_of_month: byDayOfMonth,
+    //   occurence: occurrences,
+    //   interval: repeatEvery,
+    // };
+      // Initialize request body with common fields
+      const requestBody = {
+        date: new Date().toISOString().split("T")[0],
+        item_id: task.id,
+        start: startDate,
+        frequency: repeatUnit,
+        ritual_flag: isRitual,
+        by_day_of_week: byDayOfWeek,
+        by_day_of_month: byDayOfMonth,
+        interval: repeatEvery,
+        end: endDate, 
+        occurrence: occurrences,
+      };
+      
+      console.log("end type is: ", endType);
+      // Conditionally set end or occurrence based on endType
+      if (endType === "ON") {
+        requestBody.end = endDate;
+        requestBody.occurrence = 0;
+      } else if (endType === "AFTER") {
+        requestBody.occurrence = occurrences;
+        requestBody.end = "";
+      } else if (endType === "NEVER") {
+        requestBody.occurrence = 0;
+        requestBody.end = "";
+      }
+      console.log("Request Body:", requestBody);
+
+    const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN"); //check
 
     try {
       const AUTH_TOKEN = localStorage.getItem("authToken");
@@ -102,7 +158,6 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
     }
   };
 
-  // Change: Toggle Boolean Array for Day Selection
   const toggleDayOfWeek = (index: number) => {
     setByDayOfWeek((prevDays) =>
       prevDays.map((selected, i) => (i === index ? !selected : selected))
@@ -139,6 +194,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
             <label>On:</label>
             <div style={inlineStyle}>
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => (
+                //console.log(`${day} button state:`, byDayOfWeek[index]),
                 <button
                   key={day}
                   onClick={() => toggleDayOfWeek(index)}
@@ -182,13 +238,69 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
           style={inputStyle}
         />
 
-        <label>Ends:</label>
+        {/* <label>Ends:</label>
         <input
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
           style={inputStyle}
-        />
+        /> */}
+
+<label>Ends:</label>
+        <div>
+          <label>
+            <input
+              type="radio"
+              name="endType"
+              value="NEVER"
+              checked={endType === "NEVER"}
+              onChange={() => setEndType("NEVER")}
+            />
+            Never
+          </label>
+          <br />
+
+          <label>
+            <input
+              type="radio"
+              name="endType"
+              value="ON"
+              checked={endType === "ON"}
+              onChange={() => setEndType("ON")}
+            />
+            On
+          </label>
+          {endType === "ON" && (
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              style={inputStyle}
+            />
+          )}
+          <br />
+
+          <label>
+            <input
+              type="radio"
+              name="endType"
+              value="AFTER"
+              checked={endType === "AFTER"}
+              onChange={() => setEndType("AFTER")}
+            />
+            After
+          </label>
+          {endType === "AFTER" && (
+            <input
+              type="number"
+              value={occurrences}
+              onChange={(e) => setOccurrences(Number(e.target.value))}
+              min={1}
+              style={inputStyle}
+            />
+          )}
+          {endType === "AFTER" && <span> occurrences</span>}
+        </div>
 
         <label>Ritual:</label>
         <input

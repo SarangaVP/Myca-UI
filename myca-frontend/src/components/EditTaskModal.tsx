@@ -38,7 +38,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
 
   const handleUpdateTask = () => {
 
-    const today = new Date().toISOString().split("T")[0]; // Format date
+    const today = new Date().toISOString().split("T")[0];
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
 
     const updateData = {

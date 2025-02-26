@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Plan from "./pages/Plan";
+import Focus from "./pages/Focus";
 import Sidebar from "./components/Sidebar";
 
 const App: React.FC = () => {
@@ -18,6 +19,15 @@ const App: React.FC = () => {
           <div style={{ display: "flex", height: "100vh", backgroundColor: "#f8f9fa" }}>
             <Sidebar />
             <Plan />
+          </div>
+        }
+      />
+      <Route
+        path="/focus"
+        element={
+          <div style={{ display: "flex", height: "100vh", backgroundColor: "#f8f9fa" }}>
+            <Sidebar />
+            <Focus/>
           </div>
         }
       />
