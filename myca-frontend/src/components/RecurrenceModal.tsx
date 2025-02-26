@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Task } from "./TaskItem";
 // import { BASE_URL, AUTH_TOKEN } from "../config";
-
 import { BASE_URL} from "../config";
+
 
 interface RecurrenceModalProps {
   isOpen: boolean;
@@ -31,19 +31,16 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
   const [occurrences, setOccurrences] = useState(0);
   const [isRitual, setIsRitual] = useState(false);
 
-  // Change: Use Boolean Array for Days of Week
   const [byDayOfWeek, setByDayOfWeek] = useState<boolean[]>([false, false, false, false, false, false, false]);
   const [byDayOfMonth, setByDayOfMonth] = useState(1);
 
   const [endType, setEndType] = useState("NEVER"); // ON, AFTER, NEVER
 
-  // Change: Load Existing Data as Boolean Array
   useEffect(() => {
     const fetchRecurrence = async () => {
       const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
       if (isOpen) {
         try {
-          const AUTH_TOKEN = localStorage.getItem("authToken");
           const response = await fetch(`${BASE_URL}/getItems`, {
             method: "POST",
             headers: {
@@ -67,9 +64,8 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
               setByDayOfMonth(ritual.by_day_of_month || 1);
               setIsRitual(ritual.ritual_flag || false);
 
-              // Change: Convert string array to boolean array for byDayOfWeek
               //const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-              const selectedDays = ritual.by_day_of_week || [];
+              const selectedDays = ritual.by_day_of_week || [false, false, false, false, false, false, false];
               //console.log("Selected Days:", selectedDays); 
               //const booleanArray = daysOfWeek.map((day) => selectedDays.includes(day));
               //console.log("Preloaded byDayOfWeek:", booleanArray);
@@ -134,10 +130,9 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
       }
       console.log("Request Body:", requestBody);
 
-    const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN"); //check
+    const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN"); 
 
     try {
-      const AUTH_TOKEN = localStorage.getItem("authToken");
       const response = await fetch(`${BASE_URL}/setUpRecurrence`, {
         method: "POST",
         headers: {

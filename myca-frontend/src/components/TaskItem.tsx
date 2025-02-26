@@ -1,110 +1,9 @@
-// import React, { useState } from "react";
-// import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote } from "react-icons/fa"; 
-// import TaskInput from "./TaskInput";
-// import RecurrenceModal from "./RecurrenceModal";
-// import NoteModal from "./NoteModal"; 
-
-// export interface Task {
-//   id: string;
-//   name: string;
-//   isFocused: boolean;
-//   note?: string;
-//   children?: Task[];
-// }
-
-// interface TaskItemProps {
-//   task: Task;
-//   refreshTasks: () => void;
-//   onEditTask: (task: Task) => void;
-// }
-
-// const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) => {
-//   const [isExpanded, setIsExpanded] = useState(false);
-//   const [isAddingChild, setIsAddingChild] = useState(false);
-//   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
-//   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false); 
-
-//   return (
-//     <div style={taskContainerStyle}>
-//       <div style={taskRowStyle}>
-//         {/* Expand/Collapse Button */}
-//         {task.children && task.children.length > 0 && (
-//           <button onClick={() => setIsExpanded(!isExpanded)} style={toggleButtonStyle}>
-//             {isExpanded ? "▼" : "▶"}
-//           </button>
-//         )}
-
-//         {/* Task Name with Star Icon for Focused Items */}
-//         <span style={taskTextStyle}>
-//           {task.name} 
-//           {task.isFocused && <FaStar style={starIconStyle} />}
-//         </span>
-
-//         {/* Note Icon */}
-//         <button onClick={() => setIsNoteModalOpen(true)} style={noteButtonStyle}>
-//           <FaStickyNote /> 
-//         </button>
-
-//         {/* Recurrence Icon */}
-//         <button onClick={() => setIsRecurrenceModalOpen(true)} style={recurrenceButtonStyle}>
-//           <FaSyncAlt /> 
-//         </button>
-
-//         {/* Add Child Task Button */}
-//         <button onClick={() => setIsAddingChild(!isAddingChild)} style={addButtonStyle}>
-//           <FaPlus /> 
-//         </button>
-
-//         {/* Edit Task Button */}
-//         <button onClick={() => onEditTask(task)} style={editButtonStyle}>
-//           <FaEdit />
-//         </button>
-//       </div>
-
-//       {/* Task Input for Adding a Child Task */}
-//       {isAddingChild && (
-//         <TaskInput refreshTasks={refreshTasks} parentId={task.id} onClose={() => setIsAddingChild(false)} />
-//       )}
-
-//       {/* Show Child Tasks */}
-//       {isExpanded && task.children && (
-//         <div style={childTaskContainerStyle}>
-//           {task.children.map((child) => (
-//             <TaskItem key={child.id} task={child} refreshTasks={refreshTasks} onEditTask={onEditTask} />
-//           ))}
-//         </div>
-//       )}
-
-//       {/* Recurrence Modal */}
-//       {isRecurrenceModalOpen && (
-//         <RecurrenceModal 
-//           isOpen={isRecurrenceModalOpen} 
-//           onClose={() => setIsRecurrenceModalOpen(false)} 
-//           task={task} 
-//         />
-//       )}
-
-//       {/* Note Modal */}
-//       {isNoteModalOpen && (
-//         <NoteModal
-//           isOpen={isNoteModalOpen}
-//           onClose={() => setIsNoteModalOpen(false)}
-//           taskId={task.id}  
-//           refreshTasks={refreshTasks}
-//         />
-//       )}
-//     </div>
-//   );
-// };
-
-
-
 import React, { useState } from "react";
-import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote } from "react-icons/fa"; 
+import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote } from "react-icons/fa";
 import TaskInput from "./TaskInput";
 import RecurrenceModal from "./RecurrenceModal";
-import NoteModal from "./NoteModal"; 
-import { BASE_URL} from "../config";
+import NoteModal from "./NoteModal";
+import { BASE_URL } from "../config";
 
 export interface Task {
   id: string;
@@ -118,33 +17,64 @@ interface TaskItemProps {
   task: Task;
   refreshTasks: () => void;
   onEditTask: (task: Task) => void;
+  //check below
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDragOver?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: () => void;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
-  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false); 
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
-  // Drag and Drop States
-  const [draggingItem, setDraggingItem] = useState<string | null>(null);
+  // Drag and Drop State
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
 
   // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
-    setDraggingItem(itemId);
+    e.stopPropagation(); // Add this line
     e.dataTransfer.setData("text/plain", itemId);
+    e.dataTransfer.effectAllowed = "move";
+    console.log("Setting Dragging Item:", itemId);
   };
 
   const handleDragOver = (e: React.DragEvent, itemId: string) => {
+    e.stopPropagation();
     e.preventDefault();
     setDragOverItem(itemId);
   };
 
+  const handleDragEnd = () => {
+    setDragOverItem(null);
+  };
+
+  // const isDescendant = (parent: Task, childId: string): boolean => {
+  //   if (!parent.children) return false;
+  //   for (const child of parent.children) {
+  //     if (child.id === childId || isDescendant(child, childId)) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // };
+
   const handleDrop = async (e: React.DragEvent, newParentId: string) => {
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     e.preventDefault();
+    e.stopPropagation(); 
     const itemId = e.dataTransfer.getData("text/plain");
+
+    console.log("Dropped Item:", itemId);
+    console.log("New Parent:", newParentId);
+
+    // if (isDescendant(task, itemId)) {
+    //   console.error("Cannot drop a parent item onto one of its descendants.");
+    //   return;
+    // }
 
     if (itemId && newParentId && itemId !== newParentId) {
       try {
@@ -172,7 +102,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
       }
     }
 
-    setDraggingItem(null);
     setDragOverItem(null);
   };
 
@@ -182,6 +111,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
       onDragStart={(e) => handleDragStart(e, task.id)}
       onDragOver={(e) => handleDragOver(e, task.id)}
       onDrop={(e) => handleDrop(e, task.id)}
+      onDragEnd={handleDragEnd}
       style={{
         ...taskContainerStyle,
         border: dragOverItem === task.id ? "2px dashed #007bff" : "1px solid #ccc",
@@ -198,23 +128,23 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
 
         {/* Task Name with Star Icon for Focused Items */}
         <span style={taskTextStyle}>
-          {task.name} 
+          {task.name}
           {task.isFocused && <FaStar style={starIconStyle} />}
         </span>
 
         {/* Note Icon */}
         <button onClick={() => setIsNoteModalOpen(true)} style={noteButtonStyle}>
-          <FaStickyNote /> 
+          <FaStickyNote />
         </button>
 
         {/* Recurrence Icon */}
         <button onClick={() => setIsRecurrenceModalOpen(true)} style={recurrenceButtonStyle}>
-          <FaSyncAlt /> 
+          <FaSyncAlt />
         </button>
 
         {/* Add Child Task Button */}
         <button onClick={() => setIsAddingChild(!isAddingChild)} style={addButtonStyle}>
-          <FaPlus /> 
+          <FaPlus />
         </button>
 
         {/* Edit Task Button */}
@@ -229,20 +159,38 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
       )}
 
       {/* Show Child Tasks */}
-      {isExpanded && task.children && (
+      {/* {isExpanded && task.children && (
         <div style={childTaskContainerStyle}>
           {task.children.map((child) => (
             <TaskItem key={child.id} task={child} refreshTasks={refreshTasks} onEditTask={onEditTask} />
           ))}
         </div>
-      )}
+      )} */}
+      {isExpanded && task.children && (
+  <div style={childTaskContainerStyle}>
+    {task.children.map((child) => (
+      <TaskItem 
+        key={child.id} 
+        task={child} 
+        refreshTasks={refreshTasks} 
+        onEditTask={onEditTask} 
+        draggable
+        onDragStart={(e) => handleDragStart(e, child.id)}
+        onDragOver={(e) => handleDragOver(e, child.id)}
+        onDrop={(e) => handleDrop(e, child.id)}
+        onDragEnd={handleDragEnd}
+      />
+    ))}
+  </div>
+)}
+
 
       {/* Recurrence Modal */}
       {isRecurrenceModalOpen && (
-        <RecurrenceModal 
-          isOpen={isRecurrenceModalOpen} 
-          onClose={() => setIsRecurrenceModalOpen(false)} 
-          task={task} 
+        <RecurrenceModal
+          isOpen={isRecurrenceModalOpen}
+          onClose={() => setIsRecurrenceModalOpen(false)}
+          task={task}
         />
       )}
 
@@ -251,13 +199,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
         <NoteModal
           isOpen={isNoteModalOpen}
           onClose={() => setIsNoteModalOpen(false)}
-          taskId={task.id}  
+          taskId={task.id}
           refreshTasks={refreshTasks}
         />
       )}
     </div>
   );
 };
+
 
 // Styles
 const taskContainerStyle: React.CSSProperties = {

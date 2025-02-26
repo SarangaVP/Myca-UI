@@ -78,7 +78,6 @@ const Plan: React.FC = () => {
     if (authToken) {
       fetchTasks();
     } else {
-      // Watch for changes in localStorage and re-run fetchTasks when the token is set
       const interval = setInterval(() => {
         const newToken = localStorage.getItem("AUTH_TOKEN");
         if (newToken) {
@@ -91,7 +90,7 @@ const Plan: React.FC = () => {
   }, [authToken]);
 
   useEffect(() => {
-    console.log("Tasks updated:", tasks);
+    // console.log("Tasks updated:", tasks);
   }, [tasks]);
 
   const displayDate = today.toLocaleDateString("en-US", {
