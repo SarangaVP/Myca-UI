@@ -57,7 +57,7 @@ const Focus: React.FC = () => {
         credentials: "include",
         body: JSON.stringify({
           date: formattedDate,
-          focused_items: [],
+          ritual_list: [],
         }),
       });
 
@@ -76,7 +76,7 @@ const Focus: React.FC = () => {
         credentials: "include",
         body: JSON.stringify({
           date: formattedDate,
-          focused_items: [],
+          in_progress_items: [],
         }),
       });
 
