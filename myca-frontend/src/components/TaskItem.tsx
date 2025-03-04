@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote } from "react-icons/fa";
+import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote, FaBellSlash} from "react-icons/fa";
 import TaskInput from "./TaskInput";
 import RecurrenceModal from "./RecurrenceModal";
 import NoteModal from "./NoteModal";
+import SnoozeModal from "./SnoozeModal";
+import {  } from "react-icons/fa";
 import { BASE_URL } from "../config";
 
 export interface Task {
@@ -11,6 +13,7 @@ export interface Task {
   name: string;
   isFocused: boolean;
   note?: string;
+  isSnoozed: boolean;
   children?: Task[];
 }
 
@@ -31,6 +34,9 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+
+  const [isSnoozeModalOpen, setIsSnoozeModalOpen] = useState(false);
+  const [isSnoozed, setIsSnoozed] = useState(task.isSnoozed || false);
 
   // Drag and Drop State
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
@@ -53,16 +59,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
     setDragOverItem(null);
   };
 
-  // const isDescendant = (parent: Task, childId: string): boolean => {
-  //   if (!parent.children) return false;
-  //   for (const child of parent.children) {
-  //     if (child.id === childId || isDescendant(child, childId)) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // };
-
   const handleDrop = async (e: React.DragEvent, newParentId: string) => {
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     e.preventDefault();
@@ -71,11 +67,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
 
     console.log("Dropped Item:", itemId);
     console.log("New Parent:", newParentId);
-
-    // if (isDescendant(task, itemId)) {
-    //   console.error("Cannot drop a parent item onto one of its descendants.");
-    //   return;
-    // }
 
     if (itemId && newParentId && itemId !== newParentId) {
       try {
@@ -133,6 +124,11 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
           {task.isFocused && <FaStar style={starIconStyle} />}
         </span>
 
+        {/* Snooze Button */}
+        <button onClick={() => setIsSnoozeModalOpen(true)} style={snoozeButtonStyle}>
+          <FaBellSlash />
+        </button>
+
         {/* Note Icon */}
         <button onClick={() => setIsNoteModalOpen(true)} style={noteButtonStyle}>
           <FaStickyNote />
@@ -159,19 +155,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
         <TaskInput refreshTasks={refreshTasks} parentId={task.id} onClose={() => setIsAddingChild(false)} />
       )}
 
-      {/* Show Child Tasks */}
-      {/* {isExpanded && task.children && (
-        <div style={childTaskContainerStyle}>
-          {task.children.map((child) => (
-            <TaskItem
-              key={child.id}
-              task={child}
-              refreshTasks={refreshTasks}
-              onEditTask={onEditTask}
-            />
-          ))}
-        </div>
-      )} */}
       {isExpanded && task.children && (
   <div style={childTaskContainerStyle}>
     {task.children.map((child) => (
@@ -189,7 +172,19 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
     ))}
   </div>
 )}
-
+      {/* Snooze Modal */}
+{isSnoozeModalOpen && (
+  <SnoozeModal
+    isOpen={isSnoozeModalOpen}
+    onClose={() => setIsSnoozeModalOpen(false)}
+    itemId={task.id}
+    initialSnoozeStatus={isSnoozed}
+    refreshTasks={() => {
+      refreshTasks();
+      setIsSnoozed(true); 
+    }}
+  />
+)}
 
       {/* Recurrence Modal */}
       {isRecurrenceModalOpen && (
@@ -209,6 +204,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
           refreshTasks={refreshTasks}
         />
       )}
+
+
     </div>
   );
 };
@@ -316,6 +313,20 @@ const childTaskContainerStyle: React.CSSProperties = {
   paddingLeft: "20px",
   marginTop: "8px",
   borderLeft: "2px solid #ccc",
+};
+
+const snoozeButtonStyle: React.CSSProperties = {
+  backgroundColor: "#6c757d",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "5px",
+  border: "none",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+  transition: "0.2s ease-in-out",
+  marginRight: "5px",
 };
 
 export default TaskItem;
