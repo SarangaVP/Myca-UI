@@ -1,31 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { BASE_URL } from "../config"; 
 
 const Journal: React.FC = () => {
   const [journalEntry, setJournalEntry] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const today = new Date();
+  const formattedDate = today.toISOString().split("T")[0];
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setJournalEntry(e.target.value);
+  useEffect(() => {
+    fetchJournalNote();
+  }, []);
+
+  const fetchJournalNote = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}/journalNote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("AUTH_TOKEN")}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ date: formattedDate, note:"" }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status === 200 && data.reports.length > 0) {
+        setJournalEntry(data.reports[0].context.note || "");
+      } else {
+        setJournalEntry("");
+      }
+    } catch (error) {
+      console.error("Error fetching journal note:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const today = new Date();
-  const displayDate = today.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
+  const saveJournalNote = async () => {
+    setSaving(true);
+    try {
+      const response = await fetch(`${BASE_URL}/journalNote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("AUTH_TOKEN")}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ date: formattedDate, note: journalEntry }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      console.log("Journal note saved successfully!");
+    } catch (error) {
+      console.error("Error saving journal note:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div style={containerStyle}>
       <h2 style={titleStyle}>Journal</h2>
-      <p style={dateStyle}>{displayDate}</p>
- 
+      <p style={dateStyle}>{today.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      })}</p>
+
       <p style={instructionStyle}>Add any thoughts or reflections for the day here</p>
 
-      <textarea
-        value={journalEntry}
-        onChange={handleChange}
-        style={textAreaStyle}
-      />
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <textarea
+            value={journalEntry}
+            onChange={(e) => setJournalEntry(e.target.value)}
+            style={textAreaStyle}
+          />
+          <button onClick={saveJournalNote} style={buttonStyle} disabled={saving}>
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </>
+      )}
     </div>
   );
 };
@@ -55,7 +121,6 @@ const dateStyle: React.CSSProperties = {
 const instructionStyle: React.CSSProperties = {
   fontSize: "16px",
   color: "#333",
-  marginTop: "20px",
   marginBottom: "10px",
 };
 
@@ -67,6 +132,17 @@ const textAreaStyle: React.CSSProperties = {
   border: "1px solid #ccc",
   resize: "vertical",
   fontSize: "16px",
+};
+
+const buttonStyle: React.CSSProperties = {
+  marginTop: "10px",
+  padding: "10px 20px",
+  fontSize: "16px",
+  backgroundColor: "#007bff",
+  color: "#fff",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
 };
 
 export default Journal;
