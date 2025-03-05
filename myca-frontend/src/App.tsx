@@ -55,10 +55,6 @@
 
 
 
-
-
-
-
 import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
@@ -70,10 +66,12 @@ import { BASE_URL } from "./config";
 
 const App: React.FC = () => {
   const carryPreviousDay = async (token: string) => {
+    console.log("Starting carryPreviousDay with token:", token);
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
     const formattedYesterday = yesterday.toISOString().split("T")[0];
+    console.log("Sending request for date:", formattedYesterday);
 
     try {
       const response = await fetch(`${BASE_URL}/carryPreviousDay`, {
@@ -85,21 +83,27 @@ const App: React.FC = () => {
         credentials: "include",
         body: JSON.stringify({ date: formattedYesterday }),
       });
-
+      console.log("Got response with status:", response.status);
       if (!response.ok) {
-        throw new Error(`carryPreviousDay HTTP error! Status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`carryPreviousDay HTTP error! Status: ${response.status}, Details: ${errorText}`);
       }
+      console.log("carryPreviousDay succeeded!"); // Confirm success
     } catch (error) {
       console.error("Error in carryPreviousDay:", error);
     }
   };
 
   useEffect(() => {
+    console.log("useEffect is running!");
     const token = localStorage.getItem("AUTH_TOKEN");
+    console.log("Token from localStorage:", token);
     if (token) {
       carryPreviousDay(token);
+    } else {
+      console.log("No token found, skipping carryPreviousDay.");
     }
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   return (
     <Routes>
@@ -129,8 +133,6 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-
 
 
 

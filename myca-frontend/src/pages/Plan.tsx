@@ -294,10 +294,6 @@
 
 
 
-
-
-
-
 import React, { useEffect, useState } from "react";
 import TaskInput from "../components/TaskInput";
 import TaskList from "../components/TaskList";
@@ -329,7 +325,8 @@ const Plan: React.FC = () => {
     }
 
     setLoading(true);
-    
+    console.log("Starting fetchTasks with token:", token);
+
     try {
       const response = await fetch(`${BASE_URL}/getItems`, {
         method: "POST",
@@ -340,13 +337,16 @@ const Plan: React.FC = () => {
         credentials: "include",
         body: JSON.stringify({ date_input: formattedDate, items_list: [] }),
       });
+      console.log("getItems response status:", response.status);
 
       if (!response.ok) {
-        throw new Error(`getItems HTTP error! Status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`getItems HTTP error! Status: ${response.status}, Details: ${errorText}`);
       }
 
       const data = await response.json();
-      
+      console.log("getItems succeeded, got data:", data);
+
       if (data.status === 200 && data.reports.length > 0) {
         const rawTasks: Task[] = data.reports[0].map((item: any) => ({
           id: String(item.id),
@@ -368,17 +368,21 @@ const Plan: React.FC = () => {
         });
 
         setTasks(rootTasks);
+      } else {
+        console.log("getItems returned no tasks:", data); // Log if no tasks
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
     } finally {
       setLoading(false);
+      console.log("fetchTasks finished"); // Confirm it’s done
     }
   };
 
   useEffect(() => {
+    console.log("Plan useEffect running, authToken:", authToken);
     if (authToken) {
-      fetchTasks();
+      setTimeout(() => fetchTasks(), 500); // Wait 0.5s to let carryPreviousDay finish
     } else {
       const interval = setInterval(() => {
         const newToken = localStorage.getItem("AUTH_TOKEN");
