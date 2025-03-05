@@ -1,3 +1,5 @@
+
+
 // import React, { useEffect, useState } from "react";
 // import { BASE_URL } from "../config";
 // import TaskItem, { Task } from "../components/TaskItem";
@@ -13,10 +15,10 @@
 //   const [authToken, setAuthToken] = useState<string | null>(
 //     localStorage.getItem("AUTH_TOKEN")
 //   );
-//   const [editingTask, setEditingTask] = useState<Task | null>(null); // Track task being edited
+//   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
 //   const today = new Date();
-//   const formattedDate = today.toISOString().split("T")[0]; // Formats as "2025-02-25"
+//   const formattedDate = today.toISOString().split("T")[0]; // Formats as "2025-03-05"
 
 //   const fetchFocusData = async () => {
 //     const token = localStorage.getItem("AUTH_TOKEN");
@@ -27,8 +29,11 @@
 //     }
 
 //     setLoading(true);
+//     console.log("Starting fetchFocusData with token:", token);
+
 //     try {
 //       // Fetch Today's Focus
+//       console.log("Fetching Today's Focus...");
 //       const focusResponse = await fetch(`${BASE_URL}/getFocusList`, {
 //         method: "POST",
 //         headers: {
@@ -41,13 +46,17 @@
 //           focused_items: [],
 //         }),
 //       });
-
+//       console.log("getFocusList response status:", focusResponse.status);
 //       if (!focusResponse.ok) {
-//         throw new Error(`HTTP error for Today's Focus! Status: ${focusResponse.status}`);
+//         const errorText = await focusResponse.text();
+//         console.error("getFocusList failed with status:", focusResponse.status, "Details:", errorText);
+//         throw new Error(`HTTP error for Today's Focus! Status: ${focusResponse.status}, Details: ${errorText}`);
 //       }
 //       const focusData = await focusResponse.json();
+//       console.log("getFocusList succeeded, data:", focusData);
 
 //       // Fetch Today's Rituals
+//       console.log("Fetching Today's Rituals...");
 //       const ritualsResponse = await fetch(`${BASE_URL}/getRitualItems`, {
 //         method: "POST",
 //         headers: {
@@ -60,13 +69,17 @@
 //           ritual_list: [],
 //         }),
 //       });
-
+//       console.log("getRitualItems response status:", ritualsResponse.status);
 //       if (!ritualsResponse.ok) {
-//         throw new Error(`HTTP error for Today's Rituals! Status: ${ritualsResponse.status}`);
+//         const errorText = await ritualsResponse.text();
+//         console.error("getRitualItems failed with status:", ritualsResponse.status, "Details:", errorText);
+//         throw new Error(`HTTP error for Today's Rituals! Status: ${ritualsResponse.status}, Details: ${errorText}`);
 //       }
 //       const ritualsData = await ritualsResponse.json();
+//       console.log("getRitualItems succeeded, data:", ritualsData);
 
 //       // Fetch In Progress
+//       console.log("Fetching In Progress...");
 //       const inProgressResponse = await fetch(`${BASE_URL}/getInProgressItems`, {
 //         method: "POST",
 //         headers: {
@@ -79,13 +92,17 @@
 //           in_progress_items: [],
 //         }),
 //       });
-
+//       console.log("getInProgressItems response status:", inProgressResponse.status);
 //       if (!inProgressResponse.ok) {
-//         throw new Error(`HTTP error for In Progress! Status: ${inProgressResponse.status}`);
+//         const errorText = await inProgressResponse.text();
+//         console.error("getInProgressItems failed with status:", inProgressResponse.status, "Details:", errorText);
+//         throw new Error(`HTTP error for In Progress! Status: ${inProgressResponse.status}, Details: ${errorText}`);
 //       }
 //       const inProgressData = await inProgressResponse.json();
+//       console.log("getInProgressItems succeeded, data:", inProgressData);
 
 //       // Fetch Today's Recurrings
+//       console.log("Fetching Today's Recurrings...");
 //       const recurringsResponse = await fetch(`${BASE_URL}/getRecurrenceItems`, {
 //         method: "POST",
 //         headers: {
@@ -98,11 +115,14 @@
 //           focused_items: [],
 //         }),
 //       });
-
+//       console.log("getRecurrenceItems response status:", recurringsResponse.status);
 //       if (!recurringsResponse.ok) {
-//         throw new Error(`HTTP error for Today's Recurrings! Status: ${recurringsResponse.status}`);
+//         const errorText = await recurringsResponse.text();
+//         console.error("getRecurrenceItems failed with status:", recurringsResponse.status, "Details:", errorText);
+//         throw new Error(`HTTP error for Today's Recurrings! Status: ${recurringsResponse.status}, Details: ${errorText}`);
 //       }
 //       const recurringsData = await recurringsResponse.json();
+//       console.log("getRecurrenceItems succeeded, data:", recurringsData);
 
 //       // Process and categorize the data
 //       const processTasks = (data: any): Task[] => {
@@ -112,11 +132,11 @@
 //             name: item.context.name,
 //             isFocused: item.context.is_focused || false,
 //             parentId: item.context.parent_item_id || null,
-//             children: [], // Assuming no nested children for simplicity; adjust if needed
+//             children: [],
 //             context: {
 //               name: item.context.name,
-//               itype: item.context.itype || "task", // Default to "task" if not provided
-//               status: item.context.status || "running", // Default to "running" if not provided
+//               itype: item.context.itype || "task",
+//               status: item.context.status || "running",
 //             },
 //           }));
 //         }
@@ -128,7 +148,6 @@
 //       const inProgressTasks = processTasks(inProgressData);
 //       const recurringsTasks = processTasks(recurringsData);
 
-//       // Set the state for each category
 //       setTodaysFocus(focusTasks);
 //       setTodaysRituals(ritualsTasks);
 //       setInProgress(inProgressTasks);
@@ -142,12 +161,14 @@
 //       console.error("Error fetching focus data:", error);
 //     } finally {
 //       setLoading(false);
+//       console.log("fetchFocusData finished");
 //     }
 //   };
 
 //   useEffect(() => {
+//     console.log("Focus useEffect running, authToken:", authToken);
 //     if (authToken) {
-//       fetchFocusData();
+//       setTimeout(() => fetchFocusData(), 500); // Delay to let carryPreviousDay finish
 //     } else {
 //       const interval = setInterval(() => {
 //         const newToken = localStorage.getItem("AUTH_TOKEN");
@@ -166,17 +187,16 @@
 //     day: "numeric",
 //   });
 
-//   // Handler for updating/editing a task
 //   const handleUpdateTask = async (task: Task, updatedFields: Partial<Task>) => {
 //     const token = localStorage.getItem("AUTH_TOKEN");
 //     if (!token) return;
 
-//     const encodedTaskId = encodeURIComponent(task.id); // Encode the task ID
+//     const encodedTaskId = encodeURIComponent(task.id);
 //     console.log("Updating/Editing task with ID:", encodedTaskId, "Data:", updatedFields);
 
 //     try {
-//       const response = await fetch(`${BASE_URL}/updateItem`, { // Match EditTaskModal’s endpoint
-//         method: "POST", // Match EditTaskModal’s method
+//       const response = await fetch(`${BASE_URL}/updateItem`, {
+//         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",
 //           Authorization: `Bearer ${token}`,
@@ -193,16 +213,16 @@
 //       });
 
 //       if (!response.ok) {
-//         throw new Error(`HTTP error! Status: ${response.status}`);
+//         const errorText = await response.text();
+//         console.error("updateItem failed with status:", response.status, "Details:", errorText);
+//         throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
 //       }
 
-//       // Update local state based on the category
 //       if (task.isFocused) {
 //         setTodaysFocus((prev: Task[]) =>
 //           prev.map((t: Task) => (t.id === task.id ? { ...t, ...updatedFields, context: { ...t.context, ...updatedFields.context } } : t))
 //         );
 //       } else {
-//         // Assume it’s in Rituals, In Progress, or Recurrings; refine based on your logic
 //         setTodaysRituals((prev: Task[]) =>
 //           prev.map((t: Task) => (t.id === task.id ? { ...t, ...updatedFields, context: { ...t.context, ...updatedFields.context } } : t))
 //         );
@@ -214,22 +234,19 @@
 //         );
 //       }
 
-//       // Refresh tasks to ensure consistency with the backend
 //       fetchFocusData();
-//       setEditingTask(null); // Close the modal after successful update
+//       setEditingTask(null);
 //     } catch (error) {
 //       console.error("Error updating/editing task:", error);
 //     }
 //   };
 
-//   // Refresh tasks callback for TaskItem
 //   const refreshTasks = () => {
 //     fetchFocusData();
 //   };
 
-//   // Callback for editing tasks (opens modal or triggers edit)
 //   const onEditTask = (task: Task) => {
-//     setEditingTask(task); // Open the edit modal with the selected task
+//     setEditingTask(task);
 //     console.log("Editing task:", task);
 //   };
 
@@ -238,13 +255,12 @@
 //       <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "5px" }}>Focus</h2>
 //       <p style={{ fontSize: "18px", color: "#666", marginBottom: "15px" }}>{displayDate}</p>
 
-//       <TaskInput refreshTasks={refreshTasks} /> {/* Added TaskInput for consistency with Plan */}
+//       <TaskInput refreshTasks={refreshTasks} />
 
 //       {loading ? (
 //         <p>Loading tasks...</p>
 //       ) : (
 //         <div style={{ display: "flex", gap: "20px" }}>
-//           {/* Left Column: Today's Focus and In Progress */}
 //           <div style={{ flex: 1 }}>
 //             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
 //               <h3>Today's Focus <span style={{ fontSize: "12px" }}>+</span></h3>
@@ -273,7 +289,6 @@
 //             </div>
 //           </div>
 
-//           {/* Right Column: Today's Rituals and Today's Recurrings */}
 //           <div style={{ flex: 1 }}>
 //             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
 //               <h3>Today's Rituals <span style={{ fontSize: "12px" }}>🌱</span></h3>
@@ -304,7 +319,6 @@
 //         </div>
 //       )}
 
-//       {/* Edit Task Modal */}
 //       {editingTask && (
 //         <EditTaskModal
 //           task={editingTask}
@@ -318,17 +332,6 @@
 // };
 
 // export default Focus;
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -365,7 +368,6 @@ const Focus: React.FC = () => {
     console.log("Starting fetchFocusData with token:", token);
 
     try {
-      // Fetch Today's Focus
       console.log("Fetching Today's Focus...");
       const focusResponse = await fetch(`${BASE_URL}/getFocusList`, {
         method: "POST",
@@ -388,7 +390,6 @@ const Focus: React.FC = () => {
       const focusData = await focusResponse.json();
       console.log("getFocusList succeeded, data:", focusData);
 
-      // Fetch Today's Rituals
       console.log("Fetching Today's Rituals...");
       const ritualsResponse = await fetch(`${BASE_URL}/getRitualItems`, {
         method: "POST",
@@ -411,7 +412,6 @@ const Focus: React.FC = () => {
       const ritualsData = await ritualsResponse.json();
       console.log("getRitualItems succeeded, data:", ritualsData);
 
-      // Fetch In Progress
       console.log("Fetching In Progress...");
       const inProgressResponse = await fetch(`${BASE_URL}/getInProgressItems`, {
         method: "POST",
@@ -434,7 +434,6 @@ const Focus: React.FC = () => {
       const inProgressData = await inProgressResponse.json();
       console.log("getInProgressItems succeeded, data:", inProgressData);
 
-      // Fetch Today's Recurrings
       console.log("Fetching Today's Recurrings...");
       const recurringsResponse = await fetch(`${BASE_URL}/getRecurrenceItems`, {
         method: "POST",
@@ -457,7 +456,6 @@ const Focus: React.FC = () => {
       const recurringsData = await recurringsResponse.json();
       console.log("getRecurrenceItems succeeded, data:", recurringsData);
 
-      // Process and categorize the data
       const processTasks = (data: any): Task[] => {
         if (data.status === 200 && data.reports && data.reports.length > 0) {
           return data.reports[0].map((item: any) => ({
@@ -501,7 +499,7 @@ const Focus: React.FC = () => {
   useEffect(() => {
     console.log("Focus useEffect running, authToken:", authToken);
     if (authToken) {
-      setTimeout(() => fetchFocusData(), 500); // Delay to let carryPreviousDay finish
+      setTimeout(() => fetchFocusData(), 500);
     } else {
       const interval = setInterval(() => {
         const newToken = localStorage.getItem("AUTH_TOKEN");
@@ -588,8 +586,6 @@ const Focus: React.FC = () => {
       <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "5px" }}>Focus</h2>
       <p style={{ fontSize: "18px", color: "#666", marginBottom: "15px" }}>{displayDate}</p>
 
-      <TaskInput refreshTasks={refreshTasks} />
-
       {loading ? (
         <p>Loading tasks...</p>
       ) : (
@@ -598,6 +594,7 @@ const Focus: React.FC = () => {
             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
               <h3>Today's Focus <span style={{ fontSize: "12px" }}>+</span></h3>
               <p>These are your priorities for today</p>
+              <TaskInput refreshTasks={refreshTasks} isFocused={true} /> {/* Set isFocused here */}
               {todaysFocus.map((task: Task) => (
                 <TaskItem
                   key={task.id}
