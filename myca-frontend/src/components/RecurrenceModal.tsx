@@ -8,6 +8,7 @@ interface RecurrenceModalProps {
   isOpen: boolean;
   onClose: () => void;
   task: Task;
+  refreshTasks: () => void;
 }
 
 // interface RecurrenceRequestBody {
@@ -23,7 +24,7 @@ interface RecurrenceModalProps {
 //   occurrence?: number; // Optional occurrence
 // }
 
-const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task }) => {
+const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task, refreshTasks }) => {
   const [repeatEvery, setRepeatEvery] = useState(1);
   const [repeatUnit, setRepeatUnit] = useState("DAYS");
   const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
@@ -144,6 +145,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = ({ isOpen, onClose, task
 
       const data = await response.json();
       if (data.status === 200) {
+        refreshTasks();
         onClose();
       } else {
         console.error("Failed to save recurrence");

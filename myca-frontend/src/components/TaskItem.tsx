@@ -192,6 +192,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask }) =
           isOpen={isRecurrenceModalOpen}
           onClose={() => setIsRecurrenceModalOpen(false)}
           task={task}
+          refreshTasks={refreshTasks}
         />
       )}
 
