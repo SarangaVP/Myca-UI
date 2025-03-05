@@ -292,8 +292,6 @@
 
 
 
-
-
 import React, { useEffect, useState } from "react";
 import TaskInput from "../components/TaskInput";
 import TaskList from "../components/TaskList";
@@ -341,6 +339,7 @@ const Plan: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("getItems failed with status:", response.status, "Details:", errorText);
         throw new Error(`getItems HTTP error! Status: ${response.status}, Details: ${errorText}`);
       }
 
@@ -369,13 +368,13 @@ const Plan: React.FC = () => {
 
         setTasks(rootTasks);
       } else {
-        console.log("getItems returned no tasks:", data); // Log if no tasks
+        console.log("getItems returned no tasks:", data);
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
     } finally {
       setLoading(false);
-      console.log("fetchTasks finished"); // Confirm it’s done
+      console.log("fetchTasks finished");
     }
   };
 

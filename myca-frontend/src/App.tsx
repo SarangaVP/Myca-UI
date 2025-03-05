@@ -50,8 +50,6 @@
 
 
 
-
-
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
@@ -85,6 +83,7 @@ const App: React.FC = () => {
       console.log("Got response with status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("carryPreviousDay failed with status:", response.status, "Details:", errorText);
         throw new Error(`carryPreviousDay HTTP error! Status: ${response.status}, Details: ${errorText}`);
       }
       console.log("carryPreviousDay succeeded!");
@@ -93,27 +92,24 @@ const App: React.FC = () => {
     }
   };
 
-  // Run on reload and token change
   useEffect(() => {
     console.log("App useEffect running, checking token...");
     const token = localStorage.getItem("AUTH_TOKEN");
     if (token) {
-      // Run carryPreviousDay on every reload or token update, even if token "matches"
       carryPreviousDay(token);
       if (token !== authToken) {
-        setAuthToken(token); // Update state if token changed (e.g., new expiration)
+        setAuthToken(token);
       }
     } else if (authToken) {
-      setAuthToken(null); // Clear state if token is gone (logout)
+      setAuthToken(null);
     }
   }, [authToken]);
 
-  // Watch localStorage for login/token changes
   useEffect(() => {
     const checkToken = () => {
       const newToken = localStorage.getItem("AUTH_TOKEN");
       if (newToken !== authToken) {
-        setAuthToken(newToken); // Trigger first useEffect on token change
+        setAuthToken(newToken);
       }
     };
     const interval = setInterval(checkToken, 500);
@@ -148,6 +144,7 @@ const App: React.FC = () => {
 };
 
 export default App;
+
 
 // // src/App.tsx
 // import React from "react";
