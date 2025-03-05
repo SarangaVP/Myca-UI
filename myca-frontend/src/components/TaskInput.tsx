@@ -31,7 +31,7 @@ const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose
       date: new Date().toISOString().split("T")[0],
       item_name: taskName,
       item_type: taskType,
-      item_status: "running",
+      item_status: "open",
       parent_item_id: parentId,
       note: taskType === "link" ? note : "", 
     };
