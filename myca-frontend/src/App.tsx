@@ -56,6 +56,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Plan from "./pages/Plan";
 import Focus from "./pages/Focus";
+import Journal from "./pages/Journal";
 import Sidebar from "./components/Sidebar";
 import { BASE_URL } from "./config";
 
@@ -136,6 +137,15 @@ const App: React.FC = () => {
           <div style={{ display: "flex", height: "100vh", backgroundColor: "#f8f9fa" }}>
             <Sidebar />
             <Focus />
+          </div>
+        }
+      />
+      <Route
+        path="/journal"
+        element={
+          <div style={{ display: "flex", height: "100vh", backgroundColor: "#f8f9fa" }}>
+            <Sidebar />
+            <Journal />
           </div>
         }
       />

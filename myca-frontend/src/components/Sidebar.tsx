@@ -34,7 +34,7 @@ const Sidebar: React.FC = () => {
         </li>
         <li
           style={menuItemStyle(activeItem === "Journal")}
-          onClick={() => setActiveItem("Journal")}
+          onClick={() => navigateTo("Journal", "/journal")}
         >
           Journal
         </li>
