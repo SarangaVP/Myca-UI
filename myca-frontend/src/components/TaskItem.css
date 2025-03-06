@@ -1,4 +1,17 @@
 .task-item-menu-item:hover {
-    background-color: #e0e0e0;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    background-color: #007bff; /* Blue on hover */
+    color: #fff; /* White text on hover */
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Animation for menu slide-in */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(5px);
+    }
   }
