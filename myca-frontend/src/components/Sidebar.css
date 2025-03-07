@@ -1,0 +1,20 @@
+.sidebar-menu-item:hover {
+    background-color: #f0f0f0;
+    padding-left: 20px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 200px !important; /* Smaller on tablets */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .sidebar {
+      width: 60px !important; /* Collapsed by default on mobile */
+    }
+    .sidebar.expanded {
+      width: 250px !important; /* Expand on toggle */
+    }
+  }
