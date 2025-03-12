@@ -86,7 +86,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
           onChange={(e) => setNewType(e.target.value)} 
           style={inputStyle}
         >
-          <option value="">Select Type</option>
           <option value="task">Task</option>
           <option value="note">Note</option>
           <option value="group">Group</option>
@@ -99,7 +98,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
           onChange={(e) => setNewStatus(e.target.value)} 
           style={inputStyle}
         >
-          <option value="">Select Status</option>
+          <option value="open">Open</option>
           <option value="running">Running</option>
           <option value="completed">Completed</option>
           <option value="canceled">Canceled</option>

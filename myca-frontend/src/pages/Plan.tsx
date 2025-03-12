@@ -327,6 +327,12 @@ const Plan: React.FC = () => {
             isFocused: item.context.is_focused || false,
             parentId: item.context.parent_item_id || null,
             children: [],
+            //check
+            context: {
+              name: item.context.name,
+              itype: item.context.itype || "task",
+              status: item.context.status || "running",
+            },
           }));
         }
 
