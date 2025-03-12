@@ -209,6 +209,7 @@ const Plan: React.FC = () => {
     "In Progress": "running",
   };
 
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
@@ -218,6 +219,22 @@ const Plan: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  //check
+  const flattenTasks = (tasks: Task[]): Task[] => {
+    const result: Task[] = [];
+    const stack: Task[] = [...tasks];
+
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      result.push(current);
+      if (current.children && current.children.length > 0) {
+        stack.push(...current.children);
+      }
+    }
+
+    return result;
+  };
 
   const fetchTasks = async () => {
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -361,8 +378,13 @@ const Plan: React.FC = () => {
   };
 
   useEffect(() => {
+    const flatTasks = flattenTasks(tasks);
+    // if (searchQuery) {
+    //   const filtered = tasks.filter((task) =>
+    //     task.name.toLowerCase().includes(searchQuery.toLowerCase())
+    //   );
     if (searchQuery) {
-      const filtered = tasks.filter((task) =>
+      const filtered = flatTasks.filter((task) =>
         task.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setSuggestions(filtered);
