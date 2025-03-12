@@ -1,5 +1,4 @@
 
-
 // import React, { useEffect, useState } from "react";
 // import { BASE_URL } from "../config";
 // import TaskItem, { Task } from "../components/TaskItem";
@@ -32,7 +31,6 @@
 //     console.log("Starting fetchFocusData with token:", token);
 
 //     try {
-//       // Fetch Today's Focus
 //       console.log("Fetching Today's Focus...");
 //       const focusResponse = await fetch(`${BASE_URL}/getFocusList`, {
 //         method: "POST",
@@ -55,7 +53,6 @@
 //       const focusData = await focusResponse.json();
 //       console.log("getFocusList succeeded, data:", focusData);
 
-//       // Fetch Today's Rituals
 //       console.log("Fetching Today's Rituals...");
 //       const ritualsResponse = await fetch(`${BASE_URL}/getRitualItems`, {
 //         method: "POST",
@@ -78,7 +75,6 @@
 //       const ritualsData = await ritualsResponse.json();
 //       console.log("getRitualItems succeeded, data:", ritualsData);
 
-//       // Fetch In Progress
 //       console.log("Fetching In Progress...");
 //       const inProgressResponse = await fetch(`${BASE_URL}/getInProgressItems`, {
 //         method: "POST",
@@ -101,7 +97,6 @@
 //       const inProgressData = await inProgressResponse.json();
 //       console.log("getInProgressItems succeeded, data:", inProgressData);
 
-//       // Fetch Today's Recurrings
 //       console.log("Fetching Today's Recurrings...");
 //       const recurringsResponse = await fetch(`${BASE_URL}/getRecurrenceItems`, {
 //         method: "POST",
@@ -124,7 +119,6 @@
 //       const recurringsData = await recurringsResponse.json();
 //       console.log("getRecurrenceItems succeeded, data:", recurringsData);
 
-//       // Process and categorize the data
 //       const processTasks = (data: any): Task[] => {
 //         if (data.status === 200 && data.reports && data.reports.length > 0) {
 //           return data.reports[0].map((item: any) => ({
@@ -168,7 +162,7 @@
 //   useEffect(() => {
 //     console.log("Focus useEffect running, authToken:", authToken);
 //     if (authToken) {
-//       setTimeout(() => fetchFocusData(), 500); // Delay to let carryPreviousDay finish
+//       setTimeout(() => fetchFocusData(), 500);
 //     } else {
 //       const interval = setInterval(() => {
 //         const newToken = localStorage.getItem("AUTH_TOKEN");
@@ -255,8 +249,6 @@
 //       <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "5px" }}>Focus</h2>
 //       <p style={{ fontSize: "18px", color: "#666", marginBottom: "15px" }}>{displayDate}</p>
 
-//       <TaskInput refreshTasks={refreshTasks} />
-
 //       {loading ? (
 //         <p>Loading tasks...</p>
 //       ) : (
@@ -265,6 +257,7 @@
 //             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
 //               <h3>Today's Focus <span style={{ fontSize: "12px" }}>+</span></h3>
 //               <p>These are your priorities for today</p>
+//               <TaskInput refreshTasks={refreshTasks} isFocused={true} /> {/* Set isFocused here */}
 //               {todaysFocus.map((task: Task) => (
 //                 <TaskItem
 //                   key={task.id}
@@ -336,11 +329,35 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../config";
 import TaskItem, { Task } from "../components/TaskItem";
 import EditTaskModal from "../components/EditTaskModal";
 import TaskInput from "../components/TaskInput";
+import "./Focus.css"; // Add this if you want to reuse Plan.css or create a new one
 
 const Focus: React.FC = () => {
   const [todaysFocus, setTodaysFocus] = useState<Task[]>([]);
@@ -354,7 +371,7 @@ const Focus: React.FC = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const today = new Date();
-  const formattedDate = today.toISOString().split("T")[0]; // Formats as "2025-03-05"
+  const formattedDate = today.toISOString().split("T")[0]; // Formats as "2025-03-11"
 
   const fetchFocusData = async () => {
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -582,19 +599,23 @@ const Focus: React.FC = () => {
   };
 
   return (
-    <div style={{ flex: 1, padding: "20px", backgroundColor: "#f4f4f4" }}>
-      <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "5px" }}>Focus</h2>
-      <p style={{ fontSize: "18px", color: "#666", marginBottom: "15px" }}>{displayDate}</p>
+    <div style={containerStyle} className="focus-container">
+      <header style={headerStyle} className="focus-header">
+        <h2 style={titleStyle} className="focus-title">Focus</h2>
+        <p style={dateStyle} className="focus-date">{displayDate}</p>
+      </header>
 
       {loading ? (
-        <p>Loading tasks...</p>
+        <div style={loadingStyle} className="focus-loading">
+          <span className="spinner"></span> Loading tasks...
+        </div>
       ) : (
         <div style={{ display: "flex", gap: "20px" }}>
           <div style={{ flex: 1 }}>
             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
               <h3>Today's Focus <span style={{ fontSize: "12px" }}>+</span></h3>
               <p>These are your priorities for today</p>
-              <TaskInput refreshTasks={refreshTasks} isFocused={true} /> {/* Set isFocused here */}
+              <TaskInput refreshTasks={refreshTasks} isFocused={true} />
               {todaysFocus.map((task: Task) => (
                 <TaskItem
                   key={task.id}
@@ -659,6 +680,55 @@ const Focus: React.FC = () => {
       )}
     </div>
   );
+};
+
+// Styles (Copied from Plan.tsx)
+const containerStyle: React.CSSProperties = {
+  flex: 1,
+  padding: "40px",
+  backgroundColor: "#f4f4f4",
+  minHeight: "100vh",
+  fontFamily: "Poppins, sans-serif",
+};
+
+const headerStyle: React.CSSProperties = {
+  background: "linear-gradient(135deg, #f5f5f5, #e0e0e0)", // Whiter gradient
+  padding: "25px 30px",
+  borderRadius: "15px",
+  boxShadow: "0 6px 15px rgba(0, 0, 0, 0.15)",
+  marginBottom: "40px",
+  position: "relative",
+  overflow: "hidden",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+};
+
+const titleStyle: React.CSSProperties = {
+  fontSize: "36px",
+  fontWeight: "800",
+  marginBottom: "0",
+  color: "#000000", // Dark black
+  letterSpacing: "1px",
+  textShadow: "1px 1px 2px rgba(0, 0, 0, 0.1)",
+};
+
+const dateStyle: React.CSSProperties = {
+  fontSize: "22px",
+  color: "#000000", // Dark black
+  marginBottom: "0",
+  fontWeight: "500",
+  textShadow: "1px 1px 2px rgba(0, 0, 0, 0.1)",
+};
+
+const loadingStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "20px",
+  color: "#666",
+  marginTop: "30px",
+  gap: "15px",
 };
 
 export default Focus;

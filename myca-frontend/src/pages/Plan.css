@@ -1,0 +1,139 @@
+/* Spinner Animation */
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 4px solid #ccc;
+    border-top: 4px solid #e0e0e0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Header Overlay Effect */
+  .plan-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    pointer-events: none;
+  }
+  
+  /* Custom Tooltip with No Delay */
+  .filter-button {
+    position: relative;
+  }
+  
+  .filter-button::after {
+    content: "Filter";
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #000;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+  }
+  
+  .filter-button:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease; /* No delay */
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .plan-container {
+      padding: 30px;
+    }
+    .plan-header {
+      padding: 20px 25px;
+    }
+    .plan-title {
+      font-size: 32px;
+    }
+    .plan-date {
+      font-size: 20px;
+    }
+    .plan-loading {
+      font-size: 18px;
+    }
+    .filter-container {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .filter-wrapper {
+      width: 100%;
+    }
+    .filter-button {
+      width: 100%;
+    }
+    .filter-dropdown {
+      width: 100%;
+    }
+    .search-wrapper {
+      width: 100%;
+    }
+    .suggestions {
+      width: 100%;
+    }
+    .filter-button::after {
+      bottom: -40px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .plan-container {
+      padding: 20px;
+    }
+    .plan-header {
+      padding: 15px 20px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .plan-title {
+      font-size: 28px;
+    }
+    .plan-date {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    .plan-loading {
+      font-size: 16px;
+    }
+    .filter-container {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .filter-wrapper {
+      width: 100%;
+    }
+    .filter-button {
+      width: 100%;
+    }
+    .filter-dropdown {
+      width: 100%;
+    }
+    .search-wrapper {
+      width: 100%;
+    }
+    .suggestions {
+      width: 100%;
+    }
+    .filter-button::after {
+      bottom: -40px;
+    }
+  }
