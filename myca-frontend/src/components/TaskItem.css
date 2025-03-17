@@ -1,17 +1,212 @@
+/* Hover effect for menu items - Simplified to minimal look */
+.task-item-menu-item {
+  background-color: transparent;
+  color: #333;
+  padding: 6px 8px; /* Reduced padding */
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Reduced gap */
+  text-align: left;
+  width: 100%;
+  transition: background-color 0.2s ease-in-out;
+}
+
 .task-item-menu-item:hover {
-    background-color: #007bff; /* Blue on hover */
-    color: #fff; /* White text on hover */
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* Task container */
+.task-container {
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 8px;
+  transition: transform 0.2s ease-in-out;
+  position: relative;
+}
+
+/* Task container hover */
+.task-container:hover {
+  transform: translateY(-2px);
+}
+
+/* Task row */
+.task-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+/* Task text */
+.task-text {
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Star icon */
+.star-icon {
+  color: #ffa500;
+  margin-left: 5px;
+}
+
+/* Button group */
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Reduced gap */
+}
+
+/* Status button */
+.status-button {
+  padding: 4px 8px; /* Reduced padding */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 70px; /* Reduced width */
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Status button hover */
+.status-button:hover {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+/* Status dropdown */
+.status-dropdown {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 6px; /* Slightly reduced radius */
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  padding: 2px 0; /* Reduced padding */
+  font-size: 12px; /* Reduced font size for compactness */
+}
+
+.status-dropdown {
+  animation: fadeIn 0.2s ease-in; /* Animation for appearance */
+}
+
+/* Status dropdown item */
+.status-item {
+  background-color: transparent;
+  color: #333;
+  padding: 4px 8px; /* Reduced padding */
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background-color 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Reduced gap */
+}
+
+.status-item:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Toggle button */
+.toggle-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+/* Add button */
+.add-button {
+  background-color: #28a745;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Menu button */
+.menu-button {
+  background-color: transparent;
+  color: #555;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s ease-in-out;
+}
+
+.menu-button:hover {
+  color: #007bff;
+}
+
+/* Menu dropdown */
+.menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  transform: translateY(-160px);
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  padding: 5px 0;
+  min-width: 150px;
+}
+
+/* Child task container */
+.child-task-container {
+  padding-left: 20px;
+  margin-top: 8px;
+  border-left: 2px solid #ccc;
+}
+
+/* Animation for dropdown */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
   }
-  
-  /* Animation for menu slide-in */
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(5px);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
