@@ -100,7 +100,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
         >
           <option value="open">Open</option>
           <option value="running">Running</option>
-          <option value="completed">Completed</option>
+          <option value="done">Completed</option>
           <option value="canceled">Canceled</option>
         </select>
 
