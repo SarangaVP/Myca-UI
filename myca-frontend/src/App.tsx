@@ -119,6 +119,10 @@ import RegisterPage from "./pages/RegisterPage";
 import Plan from "./pages/Plan";
 import Focus from "./pages/Focus";
 import Journal from "./pages/Journal";
+import Life from "./pages/Life"
+import Year from "./pages/Year";
+import Month from "./pages/Month";
+import Week from "./pages/Week";
 import { SidebarProvider, Sidebar, useSidebar } from "./components/Sidebar"; // Import from Sidebar
 import { BASE_URL } from "./config";
 
@@ -209,6 +213,38 @@ const App: React.FC = () => {
             </AuthenticatedLayout>
           }
         />
+        <Route
+          path="/life"
+          element={
+            <AuthenticatedLayout>
+              <Life />
+            </AuthenticatedLayout>
+          }
+        />
+        <Route
+          path="/year"
+          element={
+            <AuthenticatedLayout>
+              <Year />
+            </AuthenticatedLayout>
+          }
+        />
+        <Route
+          path="/month"
+          element={
+            <AuthenticatedLayout>
+              <Month />
+            </AuthenticatedLayout>
+          }
+        /><Route
+        path="/week"
+        element={
+          <AuthenticatedLayout>
+            <Week />
+          </AuthenticatedLayout>
+        }
+      />
+
       </Routes>
     </SidebarProvider>
   );

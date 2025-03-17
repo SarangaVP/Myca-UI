@@ -222,16 +222,28 @@ export const Sidebar: React.FC = () => {
             </li>
 
             <li style={sectionTitleStyle}>Envision</li>
-            <li style={menuItemStyle(activeItem === "Week")} className="sidebar-menu-item">
+            <li 
+              style={menuItemStyle(activeItem === "Week")} 
+              onClick={() => navigateTo("Week", "/week")}
+              className="sidebar-menu-item">
               <FaCalendar style={iconStyle} /> Week <FaLock style={lockIconStyle} />
             </li>
-            <li style={menuItemStyle(activeItem === "Month")} className="sidebar-menu-item">
+            <li 
+              style={menuItemStyle(activeItem === "Month")} 
+              onClick={() => navigateTo("Month", "/month")}
+              className="sidebar-menu-item">
               <FaCalendar style={iconStyle} /> Month <FaLock style={lockIconStyle} />
             </li>
-            <li style={menuItemStyle(activeItem === "Year")} className="sidebar-menu-item">
+            <li 
+              style={menuItemStyle(activeItem === "Year")} 
+              onClick={() => navigateTo("Year", "/year")}
+              className="sidebar-menu-item">
               <FaCalendar style={iconStyle} /> Year <FaLock style={lockIconStyle} />
             </li>
-            <li style={menuItemStyle(activeItem === "Life")} className="sidebar-menu-item">
+            <li 
+              style={menuItemStyle(activeItem === "Life")}
+              onClick={() => navigateTo("Life", "/life")}
+              className="sidebar-menu-item">
               <FaCalendar style={iconStyle} /> Life <FaLock style={lockIconStyle} />
             </li>
 
