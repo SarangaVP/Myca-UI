@@ -1,9 +1,11 @@
 
+
 // import React, { useEffect, useState, useRef } from "react";
 // import TaskInput from "../components/TaskInput";
 // import TaskList from "../components/TaskList";
 // import EditTaskModal from "../components/EditTaskModal";
 // import { BASE_URL } from "../config";
+// import { FiFilter } from "react-icons/fi"; // Filter icon
 // import "./Plan.css";
 
 // interface Task {
@@ -68,6 +70,21 @@
 //     return () => document.removeEventListener("mousedown", handleClickOutside);
 //   }, []);
 
+//   const flattenTasks = (tasks: Task[]): Task[] => {
+//     const result: Task[] = [];
+//     const stack: Task[] = [...tasks];
+
+//     while (stack.length > 0) {
+//       const current = stack.pop()!;
+//       result.push(current);
+//       if (current.children && current.children.length > 0) {
+//         stack.push(...current.children);
+//       }
+//     }
+
+//     return result;
+//   };
+
 //   const fetchTasks = async () => {
 //     const token = localStorage.getItem("AUTH_TOKEN");
 //     if (!token) {
@@ -122,8 +139,7 @@
 //       let rawTasks: Task[] = [];
 //       if (data.status === 200 && data.reports && data.reports.length > 0) {
 //         if (selectedFilters.length > 0) {
-//           // Handle multiple tasks within reports[0]
-//           const report = data.reports[0]; // Single report object with multiple tasks
+//           const report = data.reports[0];
 //           rawTasks = Object.values(report).map((task: any) => ({
 //             id: task.id,
 //             name: task.context.name,
@@ -159,6 +175,12 @@
 //             isFocused: item.context.is_focused || false,
 //             parentId: item.context.parent_item_id || null,
 //             children: [],
+//             //check
+//             context: {
+//               name: item.context.name,
+//               itype: item.context.itype || "task",
+//               status: item.context.status || "running",
+//             },
 //           }));
 //         }
 
@@ -210,8 +232,9 @@
 //   };
 
 //   useEffect(() => {
+//     const flatTasks = flattenTasks(tasks);
 //     if (searchQuery) {
-//       const filtered = tasks.filter((task) =>
+//       const filtered = flatTasks.filter((task) =>
 //         task.name.toLowerCase().includes(searchQuery.toLowerCase())
 //       );
 //       setSuggestions(filtered);
@@ -263,7 +286,7 @@
 //             style={filterButtonStyle}
 //             className="filter-button"
 //           >
-//             ⋮
+//             <FiFilter size={25} /> {/* Increased size to 36 */}
 //           </button>
 //           {showFilterDropdown && (
 //             <div style={filterDropdownStyle}>
@@ -400,7 +423,7 @@
 //   cursor: "pointer",
 //   fontWeight: "bold",
 //   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-//   width: "40px",
+//   width: "50px", // Kept the same
 //   textAlign: "center",
 //   display: "flex",
 //   justifyContent: "center",
@@ -467,14 +490,14 @@
 //   position: "absolute",
 //   top: "100%",
 //   left: 0,
-//   right: 0,
+//   right: "0",
 //   backgroundColor: "#fff",
 //   border: "1px solid #ccc",
 //   borderRadius: "4px",
 //   boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
 //   maxHeight: "200px",
 //   overflowY: "auto",
-//   zIndex: 10,
+//   zIndex: "10",
 // };
 
 // const suggestionItemStyle: React.CSSProperties = {
@@ -497,16 +520,12 @@
 
 
 
-
-
-
-
 import React, { useEffect, useState, useRef } from "react";
 import TaskInput from "../components/TaskInput";
 import TaskList from "../components/TaskList";
 import EditTaskModal from "../components/EditTaskModal";
 import { BASE_URL } from "../config";
-import { FiFilter } from "react-icons/fi"; // Filter icon
+import { FiFilter } from "react-icons/fi";
 import "./Plan.css";
 
 interface Task {
@@ -676,7 +695,6 @@ const Plan: React.FC = () => {
             isFocused: item.context.is_focused || false,
             parentId: item.context.parent_item_id || null,
             children: [],
-            //check
             context: {
               name: item.context.name,
               itype: item.context.itype || "task",
@@ -787,7 +805,7 @@ const Plan: React.FC = () => {
             style={filterButtonStyle}
             className="filter-button"
           >
-            <FiFilter size={25} /> {/* Increased size to 36 */}
+            <FiFilter size={25} />
           </button>
           {showFilterDropdown && (
             <div style={filterDropdownStyle}>
@@ -924,7 +942,7 @@ const filterButtonStyle: React.CSSProperties = {
   cursor: "pointer",
   fontWeight: "bold",
   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-  width: "50px", // Kept the same
+  width: "50px",
   textAlign: "center",
   display: "flex",
   justifyContent: "center",
@@ -940,7 +958,7 @@ const filterDropdownStyle: React.CSSProperties = {
   borderRadius: "4px",
   boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
   padding: "10px",
-  zIndex: 10,
+  zIndex: 2000, // Increased to be above TaskItem (max zIndex 1000) but below StatusDropdownPortal (zIndex 10000)
   width: "200px",
 };
 
@@ -998,7 +1016,7 @@ const suggestionsStyle: React.CSSProperties = {
   boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
   maxHeight: "200px",
   overflowY: "auto",
-  zIndex: "10",
+  zIndex: 2000, // Increased to match filter dropdown
 };
 
 const suggestionItemStyle: React.CSSProperties = {
