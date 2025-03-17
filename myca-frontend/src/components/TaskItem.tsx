@@ -1097,8 +1097,9 @@ const menuButtonStyle: React.CSSProperties = {
 
 const menuStyle: React.CSSProperties = {
   position: "absolute",
-  right: "0", // Aligns to the right of the parent div
-  top: "100%", // Drops down right below the button
+  right: "0", 
+  top: "100%", 
+  transform: "translateY(-160px)", 
   backgroundColor: "#fff",
   borderRadius: "8px",
   border: "1px solid #ddd",
