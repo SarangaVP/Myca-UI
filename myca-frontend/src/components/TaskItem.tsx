@@ -417,8 +417,6 @@
 
 
 
-
-
 import React, { useState, useEffect, useRef } from "react";
 import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote, FaBellSlash, FaTrash, FaEllipsisV, FaPlay, FaCheck, FaTimes, FaFolderOpen } from "react-icons/fa";
 import ReactDOM from "react-dom";
@@ -465,7 +463,6 @@ const StatusDropdownPortal: React.FC<{
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Ignore the initial click that opens the dropdown
       if (!initialClick) {
         setInitialClick(true);
         return;
@@ -488,7 +485,6 @@ const StatusDropdownPortal: React.FC<{
   }, [isOpen, onClose, statusButtonRef, initialClick]);
 
   useEffect(() => {
-    // Reset initialClick when dropdown closes
     if (!isOpen) {
       setInitialClick(false);
     }
@@ -499,9 +495,8 @@ const StatusDropdownPortal: React.FC<{
   const buttonRect = statusButtonRef.current.getBoundingClientRect();
   const scrollY = window.scrollY;
   const viewportHeight = window.innerHeight;
-  const dropdownHeight = 120; // Approximate height of dropdown (4 items * ~30px each)
+  const dropdownHeight = 120;
 
-  // Determine if dropdown would be cut off at the bottom
   const isCutOff = buttonRect.bottom + dropdownHeight > viewportHeight + scrollY;
   const topPosition = isCutOff ? `${buttonRect.top + scrollY - dropdownHeight}px` : `${buttonRect.bottom + scrollY}px`;
 
@@ -699,14 +694,22 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Only handle click-outside for the menu dropdown here
-      if (menuRef.current && !menuRef.current.contains(event.target as Node) && menuButtonRef.current && !menuButtonRef.current.contains(event.target as Node)) {
+      // Only close menu if no modal is open
+      if (
+        !isSnoozeModalOpen &&
+        !isRecurrenceModalOpen &&
+        !isNoteModalOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        menuButtonRef.current &&
+        !menuButtonRef.current.contains(event.target as Node)
+      ) {
         setIsMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isSnoozeModalOpen, isRecurrenceModalOpen, isNoteModalOpen]);
 
   return (
     <div
@@ -772,7 +775,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
               <FaEllipsisV />
             </button>
             {isMenuOpen && (
-              <div ref={menuRef} className="menu-dropdown" style={{ zIndex: baseZIndex + 10 }}>
+              <div ref={menuRef} className="menu-dropdown" style={{ zIndex: 5000 }}>
                 <button
                   onClick={() => {
                     setIsSnoozeModalOpen(true);
