@@ -542,7 +542,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
     switch (status?.toLowerCase()) {
       case "running":
         return "#007bff";
-      case "completed":
+      case "done":
         return "#28a745";
       case "canceled":
         return "#dc3545";
@@ -556,7 +556,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
     switch (status?.toLowerCase()) {
       case "running":
         return <FaPlay size={10} style={{ marginRight: "2px" }} />;
-      case "completed":
+      case "done":
         return <FaCheck size={10} style={{ marginRight: "2px" }} />;
       case "canceled":
         return <FaTimes size={10} style={{ marginRight: "2px" }} />;
@@ -759,7 +759,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
               <button onClick={() => handleStatusChange("running")} className="status-item">
                 <FaPlay size={10} style={{ marginRight: "2px" }} /> Running
               </button>
-              <button onClick={() => handleStatusChange("completed")} className="status-item">
+              <button onClick={() => handleStatusChange("done")} className="status-item">
                 <FaCheck size={10} style={{ marginRight: "2px" }} /> Completed
               </button>
               <button onClick={() => handleStatusChange("canceled")} className="status-item">
