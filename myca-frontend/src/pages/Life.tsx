@@ -1,7 +1,8 @@
 import React from "react";
+import Goals from "../components/Goals"; 
 
 const Life: React.FC = () => {
-  return <div>Life</div>;
+  return <Goals timePeriod="life" />;
 };
 
 export default Life;

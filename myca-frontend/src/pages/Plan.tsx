@@ -669,7 +669,7 @@ const Plan: React.FC = () => {
             context: {
               name: task.context.name,
               itype: task.context.itype || "task",
-              status: task.context.status || "running",
+              status: task.context.status || "open",
               ritual: task.context.ritual || {
                 start: "",
                 frequency: "",
@@ -698,7 +698,7 @@ const Plan: React.FC = () => {
             context: {
               name: item.context.name,
               itype: item.context.itype || "task",
-              status: item.context.status || "running",
+              status: item.context.status || "open",
             },
           }));
         }

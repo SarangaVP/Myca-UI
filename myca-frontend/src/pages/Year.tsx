@@ -1,7 +1,8 @@
 import React from "react";
+import Goals from "../components/Goals"; 
 
 const Year: React.FC = () => {
-  return <div>Year</div>;
+  return <Goals timePeriod="year" />;
 };
 
 export default Year;

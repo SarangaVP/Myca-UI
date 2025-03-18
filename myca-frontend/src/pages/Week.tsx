@@ -1,7 +1,8 @@
 import React from "react";
+import Goals from "../components/Goals"; 
 
 const Week: React.FC = () => {
-  return <div>Week</div>;
+  return <Goals timePeriod="week" />;
 };
 
 export default Week;
