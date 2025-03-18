@@ -416,7 +416,6 @@
 
 
 
-
 import React, { useState, useEffect, useRef } from "react";
 import { FaEdit, FaPlus, FaStar, FaSyncAlt, FaStickyNote, FaBellSlash, FaTrash, FaEllipsisV, FaPlay, FaCheck, FaTimes, FaFolderOpen } from "react-icons/fa";
 import ReactDOM from "react-dom";
@@ -438,6 +437,7 @@ export interface Task {
   note?: string;
   isSnoozed: boolean;
   children?: Task[];
+  parentId?: string; // Keep this for potential future use
 }
 
 interface TaskItemProps {
@@ -450,6 +450,7 @@ interface TaskItemProps {
   onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragEnd?: () => void;
   index?: number;
+  parentId?: string;
 }
 
 const StatusDropdownPortal: React.FC<{
@@ -497,8 +498,18 @@ const StatusDropdownPortal: React.FC<{
   const viewportHeight = window.innerHeight;
   const dropdownHeight = 120;
 
-  const isCutOff = buttonRect.bottom + dropdownHeight > viewportHeight + scrollY;
-  const topPosition = isCutOff ? `${buttonRect.top + scrollY - dropdownHeight}px` : `${buttonRect.bottom + scrollY}px`;
+  console.log("Status Dropdown button position:", {
+    top: buttonRect.top,
+    bottom: buttonRect.bottom,
+    left: buttonRect.left,
+    scrollY,
+    viewportHeight,
+  });
+
+  const isCutOff = buttonRect.bottom + dropdownHeight + scrollY > viewportHeight + scrollY;
+  const topPosition = isCutOff
+    ? `${buttonRect.top + scrollY - dropdownHeight - 5}px`
+    : `${buttonRect.bottom + scrollY + 5}px`;
 
   return ReactDOM.createPortal(
     <div
@@ -508,7 +519,7 @@ const StatusDropdownPortal: React.FC<{
         position: "absolute",
         top: topPosition,
         left: `${buttonRect.left}px`,
-        zIndex: 10000,
+        zIndex: 20000,
         minWidth: "120px",
         boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
         animation: "fadeIn 0.2s ease-in",
@@ -520,7 +531,97 @@ const StatusDropdownPortal: React.FC<{
   );
 };
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, draggable, onDragStart, onDragOver, onDrop, onDragEnd, index = 0 }) => {
+const MenuDropdownPortal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  menuButtonRef: React.RefObject<HTMLButtonElement | null>;
+  children: React.ReactNode;
+}> = ({ isOpen, onClose, menuButtonRef, children }) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [initialClick, setInitialClick] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!initialClick) {
+        setInitialClick(true);
+        return;
+      }
+
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        menuButtonRef.current &&
+        !menuButtonRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    if (isOpen && menuButtonRef.current) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onClose, menuButtonRef, initialClick]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setInitialClick(false);
+    }
+  }, [isOpen]);
+
+  if (!isOpen || !menuButtonRef.current) return null;
+
+  const buttonRect = menuButtonRef.current.getBoundingClientRect();
+  const scrollY = window.scrollY;
+  const viewportHeight = window.innerHeight;
+  const dropdownHeight = 160;
+
+  console.log("Menu Dropdown button position:", {
+    top: buttonRect.top,
+    bottom: buttonRect.bottom,
+    left: buttonRect.left,
+    right: buttonRect.right,
+    scrollY,
+    viewportHeight,
+  });
+
+  const isCutOff = buttonRect.bottom + dropdownHeight + scrollY > viewportHeight + scrollY;
+  const topPosition = isCutOff
+    ? `${buttonRect.top + scrollY - dropdownHeight - 5}px`
+    : `${buttonRect.bottom + scrollY + 5}px`;
+
+  return ReactDOM.createPortal(
+    <div
+      ref={dropdownRef}
+      className="menu-dropdown"
+      style={{
+        position: "absolute",
+        top: topPosition,
+        left: `${buttonRect.right - 150}px`,
+        zIndex: 20000,
+        minWidth: "150px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        animation: "fadeIn 0.2s ease-in",
+      }}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+};
+
+const TaskItem: React.FC<TaskItemProps> = ({
+  task,
+  refreshTasks,
+  onEditTask,
+  draggable = true,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  index = 0,
+  parentId,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
@@ -533,8 +634,12 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
   const statusRef = useRef<HTMLDivElement>(null);
   const statusButtonRef = useRef<HTMLButtonElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const taskContainerRef = useRef<HTMLDivElement>(null);
 
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDraggable, setIsDraggable] = useState(false);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const baseZIndex = 1000 - index * 10;
 
@@ -601,58 +706,137 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
     }
   };
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    console.log("Mouse down detected on task container:", task.id, "Target:", e.target);
+    if ((e.target as HTMLElement).closest(".status-button, .toggle-button, .add-button, .menu-button")) {
+      console.log("Mouse down on button, ignoring drag");
+      return;
+    }
+
+    setIsDraggable(true);
+    longPressTimer.current = setTimeout(() => {
+      setIsDragging(true);
+      if (taskContainerRef.current) {
+        taskContainerRef.current.classList.add("dragging");
+      }
+      console.log("Long press detected, enabling drag for item:", task.id);
+    }, 500);
+  };
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    console.log("Mouse up detected, isDragging:", isDragging);
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    if (!isDragging) {
+      setIsDraggable(false);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    console.log("Mouse leave detected, isDragging:", isDragging);
+    if (longPressTimer.current && !isDragging) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, itemId: string) => {
     e.stopPropagation();
+    console.log("Drag start for item:", itemId, "isDraggable:", isDraggable);
+    if (!isDraggable) {
+      console.log("Drag start prevented: isDraggable is false");
+      return;
+    }
     e.dataTransfer.setData("text/plain", itemId);
     e.dataTransfer.effectAllowed = "move";
+    setIsDragging(true);
+    if (taskContainerRef.current) {
+      taskContainerRef.current.classList.add("dragging");
+    }
     onDragStart?.(e);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>, itemId: string) => {
     e.stopPropagation();
     e.preventDefault();
-    setDragOverItem(itemId);
+    console.log("Drag over item:", itemId);
+    if (taskContainerRef.current && !taskContainerRef.current.classList.contains("dragging")) {
+      setDragOverItem(itemId);
+      taskContainerRef.current.classList.add("drag-over");
+    }
     onDragOver?.(e);
   };
 
   const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log("Drag end for item:", task.id);
     setDragOverItem(null);
+    setIsDragging(false);
+    setIsDraggable(false);
+    if (taskContainerRef.current) {
+      taskContainerRef.current.classList.remove("dragging");
+      taskContainerRef.current.classList.remove("drag-over");
+    }
     onDragEnd?.();
   };
 
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, newParentId: string) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, dropTargetId: string) => {
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     e.preventDefault();
     e.stopPropagation();
     const itemId = e.dataTransfer.getData("text/plain");
+    console.log("Drop detected, item:", itemId, "dropTargetId:", dropTargetId, "parentId:", parentId);
 
-    if (itemId && newParentId && itemId !== newParentId) {
-      try {
-        const response = await fetch(`${BASE_URL}/moveItem`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${AUTH_TOKEN}`,
-          },
-          body: JSON.stringify({
-            date: new Date().toISOString().split("T")[0],
-            item_id: itemId,
-            new_parent_id: newParentId,
-          }),
-        });
+    // Simplify to use dropTargetId directly as newParentId
+    const newParentId = dropTargetId;
 
-        const data = await response.json();
-        if (data.status === 200) {
-          refreshTasks();
-        } else {
-          console.error("Failed to move item");
-        }
-      } catch (error) {
-        console.error("Error moving item:", error);
+    // Skip if dropping on itself
+    if (!itemId || !newParentId || itemId === newParentId) {
+      console.log("Invalid drop: itemId and newParentId are the same or invalid");
+      setDragOverItem(null);
+      setIsDragging(false);
+      setIsDraggable(false);
+      if (taskContainerRef.current) {
+        taskContainerRef.current.classList.remove("drag-over");
       }
+      onDrop?.(e);
+      return;
+    }
+
+    try {
+      console.log("Making moveItem API call:", { item_id: itemId, new_parent_id: newParentId });
+      const response = await fetch(`${BASE_URL}/moveItem`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${AUTH_TOKEN}`,
+        },
+        body: JSON.stringify({
+          date: new Date().toISOString().split("T")[0],
+          item_id: itemId,
+          new_parent_id: newParentId,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.status === 200) {
+        console.log("Move successful, response:", data);
+        refreshTasks();
+      } else {
+        console.error("Failed to move item, response:", data);
+      }
+    } catch (error) {
+      console.error("Error moving item:", error);
     }
 
     setDragOverItem(null);
+    setIsDragging(false);
+    setIsDraggable(false);
+    if (taskContainerRef.current) {
+      taskContainerRef.current.classList.remove("dragging");
+      taskContainerRef.current.classList.remove("drag-over");
+    }
     onDrop?.(e);
   };
 
@@ -694,7 +878,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Only close menu if no modal is open
       if (
         !isSnoozeModalOpen &&
         !isRecurrenceModalOpen &&
@@ -713,13 +896,17 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
 
   return (
     <div
-      draggable={draggable}
+      ref={taskContainerRef}
+      draggable={isDraggable || draggable}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
       onDragStart={(e) => handleDragStart(e, task.id)}
       onDragOver={(e) => handleDragOver(e, task.id)}
       onDrop={(e) => handleDrop(e, task.id)}
       onDragEnd={handleDragEnd}
-      className="task-container"
-      style={{ border: dragOverItem === task.id ? "2px dashed #007bff" : "1px solid #ccc", zIndex: baseZIndex }}
+      className={`task-container ${isDragging ? "dragging" : ""} ${dragOverItem === task.id ? "drag-over" : ""}`}
+      style={{ zIndex: isDragging ? 10002 : baseZIndex, cursor: isDragging ? "grabbing" : "grab" }}
     >
       <div className="task-row">
         {task.children && task.children.length > 0 && (
@@ -774,49 +961,51 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
             <button ref={menuButtonRef} onClick={toggleMenu} className="menu-button">
               <FaEllipsisV />
             </button>
-            {isMenuOpen && (
-              <div ref={menuRef} className="menu-dropdown" style={{ zIndex: 5000 }}>
-                <button
-                  onClick={() => {
-                    setIsSnoozeModalOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                  className="task-item-menu-item"
-                >
-                  <FaBellSlash /> Snooze
-                </button>
-                <button
-                  onClick={() => {
-                    setIsNoteModalOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                  className="task-item-menu-item"
-                >
-                  <FaStickyNote /> Note
-                </button>
-                <button
-                  onClick={() => {
-                    setIsRecurrenceModalOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                  className="task-item-menu-item"
-                >
-                  <FaSyncAlt /> Recurrence
-                </button>
-                <button
-                  onClick={() => {
-                    onEditTask(task);
-                    setIsMenuOpen(false);
-                  }}
-                  className="task-item-menu-item"
-                >
-                  <FaEdit /> Edit
-                </button>
-                <button onClick={handleDeleteTask} className="task-item-menu-item">
-                  <FaTrash /> Delete
-                </button>
-              </div>
-            )}
+            <MenuDropdownPortal
+              isOpen={isMenuOpen}
+              onClose={() => setIsMenuOpen(false)}
+              menuButtonRef={menuButtonRef}
+            >
+              <button
+                onClick={() => {
+                  setIsSnoozeModalOpen(true);
+                  setIsMenuOpen(false);
+                }}
+                className="task-item-menu-item"
+              >
+                <FaBellSlash /> Snooze
+              </button>
+              <button
+                onClick={() => {
+                  setIsNoteModalOpen(true);
+                  setIsMenuOpen(false);
+                }}
+                className="task-item-menu-item"
+              >
+                <FaStickyNote /> Note
+              </button>
+              <button
+                onClick={() => {
+                  setIsRecurrenceModalOpen(true);
+                  setIsMenuOpen(false);
+                }}
+                className="task-item-menu-item"
+              >
+                <FaSyncAlt /> Recurrence
+              </button>
+              <button
+                onClick={() => {
+                  onEditTask(task);
+                  setIsMenuOpen(false);
+                }}
+                className="task-item-menu-item"
+              >
+                <FaEdit /> Edit
+              </button>
+              <button onClick={handleDeleteTask} className="task-item-menu-item">
+                <FaTrash /> Delete
+              </button>
+            </MenuDropdownPortal>
           </div>
         </div>
       </div>
@@ -837,6 +1026,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, refreshTasks, onEditTask, dra
               onDrop={onDrop}
               onDragEnd={onDragEnd}
               index={index + childIndex + 1}
+              parentId={task.id}
             />
           ))}
         </div>

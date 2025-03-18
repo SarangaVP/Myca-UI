@@ -2,12 +2,12 @@
 .task-item-menu-item {
   background-color: transparent;
   color: #333;
-  padding: 6px 8px; /* Reduced padding */
+  padding: 6px 8px;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px; /* Reduced gap */
+  gap: 6px;
   text-align: left;
   width: 100%;
   transition: background-color 0.2s ease-in-out;
@@ -27,11 +27,25 @@
   margin-bottom: 8px;
   transition: transform 0.2s ease-in-out;
   position: relative;
+  user-select: none;
 }
 
-/* Task container hover */
-.task-container:hover {
-  transform: translateY(-2px);
+/* Task container hover - Removed transition effect */
+.task-container:hover:not(.dragging) {
+  /* Removed transform: translateY(-2px); */
+}
+
+/* Task container dragging state */
+.task-container.dragging {
+  opacity: 0.7;
+  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.2);
+  cursor: grabbing !important;
+  transform: none !important;
+}
+
+/* Task container drag over state */
+.task-container.drag-over {
+  border: 2px dashed #007bff;
 }
 
 /* Task row */
@@ -42,7 +56,7 @@
   padding: 8px 12px;
   border-radius: 6px;
   background-color: #f8f9fa;
-  cursor: pointer;
+  cursor: default;
 }
 
 /* Task text */
@@ -54,6 +68,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  user-select: none;
 }
 
 /* Star icon */
@@ -66,54 +81,55 @@
 .button-group {
   display: flex;
   align-items: center;
-  gap: 6px; /* Reduced gap */
+  gap: 6px;
 }
 
 /* Status button */
 .status-button {
-  padding: 4px 8px; /* Reduced padding */
+  padding: 4px 8px;
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  width: 70px; /* Reduced width */
+  width: 70px;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
 }
 
-/* Status button hover */
-.status-button:hover {
+/* Status button hover - Disabled during dragging */
+.status-button:hover:not(.task-container.dragging *) {
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
 }
 
 /* Status dropdown */
 .status-dropdown {
   position: absolute;
   background-color: #fff;
-  border-radius: 6px; /* Slightly reduced radius */
+  border-radius: 6px;
   border: 1px solid #ddd;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  padding: 2px 0; /* Reduced padding */
-  font-size: 12px; /* Reduced font size for compactness */
+  padding: 2px 0;
+  font-size: 12px;
 }
 
+/* Status dropdown animation */
 .status-dropdown {
-  animation: fadeIn 0.2s ease-in; /* Animation for appearance */
+  animation: fadeIn 0.2s ease-in;
 }
 
 /* Status dropdown item */
 .status-item {
   background-color: transparent;
   color: #333;
-  padding: 4px 8px; /* Reduced padding */
+  padding: 4px 8px;
   border: none;
   cursor: pointer;
   text-align: left;
@@ -121,7 +137,7 @@
   transition: background-color 0.2s ease-in-out;
   display: flex;
   align-items: center;
-  gap: 4px; /* Reduced gap */
+  gap: 4px;
 }
 
 .status-item:hover {
@@ -136,6 +152,7 @@
   font-size: 16px;
   cursor: pointer;
   margin-right: 8px;
+  pointer-events: auto;
 }
 
 /* Add button */
@@ -151,9 +168,10 @@
   gap: 5px;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
 }
 
-.add-button:hover {
+.add-button:hover:not(.task-container.dragging *) {
   transform: scale(1.05);
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -170,18 +188,15 @@
   align-items: center;
   gap: 5px;
   transition: color 0.2s ease-in-out;
+  pointer-events: auto;
 }
 
-.menu-button:hover {
+.menu-button:hover:not(.task-container.dragging *) {
   color: #007bff;
 }
 
 /* Menu dropdown */
 .menu-dropdown {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  transform: translateY(-160px);
   background-color: #fff;
   border-radius: 8px;
   border: 1px solid #ddd;
@@ -197,6 +212,7 @@
   padding-left: 20px;
   margin-top: 8px;
   border-left: 2px solid #ccc;
+  position: relative;
 }
 
 /* Animation for dropdown */
