@@ -241,7 +241,6 @@
 
 
 
-
 import React, { useEffect, useState, useRef } from "react";
 import TaskItem from "../components/TaskItem";
 import EditTaskModal from "../components/EditTaskModal";
@@ -554,6 +553,22 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
     setSubGoalParentId(parentId);
   };
 
+  // Handle "Enter" key press for adding a goal
+  const handleGoalInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission or other default behavior
+      handleAddGoal();
+    }
+  };
+
+  // Handle "Enter" key press for adding a sub-goal
+  const handleSubGoalInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission or other default behavior
+      handleAddSubGoal();
+    }
+  };
+
   useEffect(() => {
     console.log(`Goals useEffect running for ${timePeriod}, authToken:`, authToken);
     if (authToken) {
@@ -598,8 +613,10 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
             type="text"
             value={newGoalName}
             onChange={(e) => setNewGoalName(e.target.value)}
+            onKeyDown={handleGoalInputKeyDown} // Add Enter key handler
             placeholder={`Enter the name of your new ${timePeriod} goal`}
             style={addGoalInputStyle}
+            autoFocus // Automatically focus the input when it appears
           />
           <button style={addGoalButtonStyle} onClick={handleAddGoal}>
             OK
@@ -634,8 +651,10 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
                     type="text"
                     value={subGoalName}
                     onChange={(e) => setSubGoalName(e.target.value)}
+                    onKeyDown={handleSubGoalInputKeyDown} // Add Enter key handler
                     placeholder={`Enter the name of your new sub-goal`}
                     style={addGoalInputStyle}
+                    autoFocus // Automatically focus the input when it appears
                   />
                   <button style={addGoalButtonStyle} onClick={handleAddSubGoal}>
                     OK

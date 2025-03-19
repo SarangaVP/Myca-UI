@@ -1,12 +1,13 @@
+
 // import React, { useState } from "react";
 // import { BASE_URL } from "../config";
 
-
-// const TaskInput: React.FC<{ refreshTasks: () => void; parentId?: string; onClose?: () => void }> = ({
-//   refreshTasks,
-//   parentId = "",
-//   onClose,
-// }) => {
+// const TaskInput: React.FC<{
+//   refreshTasks: () => void;
+//   parentId?: string;
+//   onClose?: () => void;
+//   isFocused?: boolean;
+// }> = ({ refreshTasks, parentId = "", onClose, isFocused = false }) => {
 //   const [taskName, setTaskName] = useState("");
 //   const [taskType, setTaskType] = useState("task");
 //   const [note, setNote] = useState("");
@@ -20,7 +21,6 @@
 //     setError(null);
 
 //     const token = localStorage.getItem("AUTH_TOKEN");
-
 //     if (!token) {
 //       setError("Authentication token is missing. Please log in again.");
 //       setLoading(false);
@@ -33,11 +33,13 @@
 //       item_type: taskType,
 //       item_status: "open",
 //       parent_item_id: parentId,
-//       note: taskType === "link" ? note : "", 
+//       note: taskType === "link" ? note : "",
+//       // Don’t include is_focused here since server ignores it
 //     };
 
 //     try {
-//       const response = await fetch(`${BASE_URL}/createNewItem`, {
+//       // Step 1: Create the task
+//       const createResponse = await fetch(`${BASE_URL}/createNewItem`, {
 //         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",
@@ -46,17 +48,47 @@
 //         body: JSON.stringify(requestBody),
 //       });
 
-//       const data = await response.json();
+//       const createData = await createResponse.json();
 
-//       if (response.ok && data.status === 200) {
-//         setTaskName("");
-//         setTaskType("task");
-//         setNote(""); 
-//         refreshTasks();
-//         if (onClose) onClose();
-//       } else {
-//         throw new Error(data.message || "Failed to add task");
+//       if (!createResponse.ok || createData.status !== 200) {
+//         throw new Error(createData.message || "Failed to add task");
 //       }
+
+//       console.log("Task added successfully:", createData);
+//       const newTaskId = createData.reports[0][0].id;
+
+//       // Step 2: Update to set is_focused if needed
+//       if (isFocused) {
+//         const updateResponse = await fetch(`${BASE_URL}/updateItem`, {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${token}`,
+//           },
+//           credentials: "include",
+//           body: JSON.stringify({
+//             date: requestBody.date,
+//             item_id: newTaskId,
+//             new_name: taskName,
+//             new_type: taskType,
+//             new_status: "open",
+//             isFocused: true, // Matches handleUpdateTask
+//           }),
+//         });
+
+//         if (!updateResponse.ok) {
+//           const errorText = await updateResponse.text();
+//           console.error("updateItem failed with status:", updateResponse.status, "Details:", errorText);
+//           throw new Error(`HTTP error! Status: ${updateResponse.status}, Details: ${errorText}`);
+//         }
+//         console.log("Task updated to focused:", newTaskId);
+//       }
+
+//       setTaskName("");
+//       setTaskType("task");
+//       setNote("");
+//       refreshTasks();
+//       if (onClose) onClose();
 //     } catch (err) {
 //       setError("Error adding task. Please try again.");
 //       console.error("Task creation error:", err);
@@ -110,7 +142,7 @@
 //   );
 // };
 
-// // Styles
+// // Styles (unchanged)
 // const taskInputContainerStyle: React.CSSProperties = {
 //   marginTop: "10px",
 //   padding: "10px",
@@ -168,6 +200,9 @@
 // };
 
 // export default TaskInput;
+
+
+
 
 
 
@@ -270,6 +305,22 @@ const TaskInput: React.FC<{
     }
   };
 
+  // Handle "Enter" key press for the task name input
+  const handleTaskNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission or other default behavior
+      handleAddTask();
+    }
+  };
+
+  // Handle "Enter" key press for the note/link input
+  const handleNoteKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission or other default behavior
+      handleAddTask();
+    }
+  };
+
   return (
     <div style={taskInputContainerStyle}>
       <div style={inputRowStyle}>
@@ -277,9 +328,11 @@ const TaskInput: React.FC<{
           type="text"
           value={taskName}
           onChange={(e) => setTaskName(e.target.value)}
+          onKeyDown={handleTaskNameKeyDown} // Add Enter key handler
           placeholder="Name"
           style={inputStyle}
           disabled={loading}
+          autoFocus // Automatically focus the input when it appears
         />
 
         <select
@@ -304,6 +357,7 @@ const TaskInput: React.FC<{
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
+          onKeyDown={handleNoteKeyDown} // Add Enter key handler for the note input
           placeholder="Link"
           style={noteInputStyle}
           disabled={loading}
