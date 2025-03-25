@@ -18,7 +18,7 @@
   color: #333;
 }
 
-/* Task container */
+/* Task container (Main Container) */
 .task-container {
   padding: 12px;
   background-color: #fff;
@@ -77,22 +77,24 @@
   margin-left: 5px;
 }
 
-/* Button group */
+/* Button group (Sub-Container) */
 .button-group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
+  min-width: 220px;
+  justify-content: flex-end;
 }
 
 /* Status button */
 .status-button {
-  padding: 4px 8px;
+  padding: 4px 12px;
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  width: 70px;
+  width: 90px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -159,13 +161,15 @@
 .add-button {
   background-color: #28a745;
   color: white;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 5px;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 5px;
+  width: 40px;
+  justify-content: center;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   pointer-events: auto;
@@ -180,13 +184,15 @@
 .menu-button {
   background-color: transparent;
   color: #555;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 5px;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 5px;
+  width: 40px;
+  justify-content: center;
   transition: color 0.2s ease-in-out;
   pointer-events: auto;
 }
