@@ -542,7 +542,7 @@ const GoalItem: React.FC<GoalItemProps> = ({
             <FaPlus />
           </button>
           {onShowPlanItems && (
-            <button onClick={onShowPlanItems} className="plan-button" style={{ marginLeft: "5px", backgroundColor: "#007bff", color: "white", border: "none", padding: "5px 10px", borderRadius: "4px" }}>
+            <button onClick={onShowPlanItems} className="plan-button" style={{ cursor: "pointer", marginLeft: "5px", backgroundColor: "#007bff", color: "white", border: "none", padding: "5px 10px", borderRadius: "4px" }}>
               Associate Items
             </button>
           )}
