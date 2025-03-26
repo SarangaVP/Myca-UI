@@ -1132,3 +1132,371 @@ export default Focus;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useState } from "react";
+// import axios, { AxiosResponse } from "axios";
+// import { BASE_URL } from "../config";
+// import TaskItem, { Task } from "../components/TaskItem";
+// import EditTaskModal from "../components/EditTaskModal";
+// import TaskInput from "../components/TaskInput";
+// import "./Focus.css";
+
+// const Focus: React.FC = () => {
+//   const [todaysFocus, setTodaysFocus] = useState<Task[]>([]);
+//   const [todaysRituals, setTodaysRituals] = useState<Task[]>([]);
+//   const [inProgress, setInProgress] = useState<Task[]>([]);
+//   const [todaysRecurrings, setTodaysRecurrings] = useState<Task[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [authToken, setAuthToken] = useState<string | null>(
+//     localStorage.getItem("AUTH_TOKEN")
+//   );
+//   const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+//   const today = new Date();
+//   const formattedDate = today.toISOString().split("T")[0];
+
+//   const fetchFocusData = async () => {
+//     const token = localStorage.getItem("AUTH_TOKEN");
+//     if (!token) {
+//       console.warn("AUTH_TOKEN not available, skipping fetch.");
+//       setLoading(false);
+//       return;
+//     }
+
+//     setLoading(true);
+//     console.log("Starting fetchFocusData with token:", token);
+
+//     const config = {
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       withCredentials: true,
+//     };
+
+//     try {
+//       console.log("Fetching Today's Focus...");
+//       const focusResponse: AxiosResponse = await axios.post(
+//         `${BASE_URL}/getFocusList`,
+//         { date: formattedDate, focused_items: [] },
+//         config
+//       );
+//       console.log("getFocusList succeeded, data:", focusResponse.data);
+
+//       console.log("Fetching Today's Rituals...");
+//       const ritualsResponse: AxiosResponse = await axios.post(
+//         `${BASE_URL}/getRitualItems`,
+//         { date: formattedDate, ritual_list: [] },
+//         config
+//       );
+//       console.log("getRitualItems succeeded, data:", ritualsResponse.data);
+
+//       console.log("Fetching In Progress...");
+//       const inProgressResponse: AxiosResponse = await axios.post(
+//         `${BASE_URL}/getInProgressItems`,
+//         { date: formattedDate, in_progress_items: [] },
+//         config
+//       );
+//       console.log("getInProgressItems succeeded, data:", inProgressResponse.data);
+
+//       console.log("Fetching Today's Recurrings...");
+//       const recurringsResponse: AxiosResponse = await axios.post(
+//         `${BASE_URL}/getRecurrenceItems`,
+//         { date: formattedDate, focused_items: [] },
+//         config
+//       );
+//       console.log("getRecurrenceItems succeeded, data:", recurringsResponse.data);
+
+//       const processTasks = (data: any): Task[] => {
+//         if (data.status === 200 && data.reports && data.reports.length > 0) {
+//           return data.reports[0].map((item: any) => ({
+//             id: String(item.id),
+//             name: item.context.name,
+//             isFocused: item.context.is_focused || false,
+//             parentId: item.context.parent_item_id || null,
+//             children: [],
+//             context: {
+//               name: item.context.name,
+//               itype: item.context.itype || "task",
+//               status: item.context.status || "running",
+//             },
+//           }));
+//         }
+//         return [];
+//       };
+
+//       const focusTasks = processTasks(focusResponse.data);
+//       const ritualsTasks = processTasks(ritualsResponse.data);
+//       const inProgressTasks = processTasks(inProgressResponse.data);
+//       const recurringsTasks = processTasks(recurringsResponse.data);
+
+//       setTodaysFocus(focusTasks);
+//       setTodaysRituals(ritualsTasks);
+//       setInProgress(inProgressTasks);
+//       setTodaysRecurrings(recurringsTasks);
+
+//       console.log("Today's Focus:", focusTasks);
+//       console.log("Today's Rituals:", ritualsTasks);
+//       console.log("In Progress:", inProgressTasks);
+//       console.log("Today's Recurrings:", recurringsTasks);
+//     } catch (error: any) {
+//       console.error("Error fetching focus data:", error.response?.data || error.message);
+//     } finally {
+//       setLoading(false);
+//       console.log("fetchFocusData finished");
+//     }
+//   };
+
+//   useEffect(() => {
+//     console.log("Focus useEffect running, authToken:", authToken);
+//     if (authToken) {
+//       setTimeout(() => fetchFocusData(), 500);
+//     } else {
+//       const interval = setInterval(() => {
+//         const newToken = localStorage.getItem("AUTH_TOKEN");
+//         if (newToken) {
+//           setAuthToken(newToken);
+//           clearInterval(interval);
+//         }
+//       }, 500);
+//       return () => clearInterval(interval);
+//     }
+//   }, [authToken]);
+
+//   const displayDate = today.toLocaleDateString("en-US", {
+//     weekday: "long",
+//     month: "long",
+//     day: "numeric",
+//   });
+
+//   const handleUpdateTask = async (task: Task, updatedFields: Partial<Task>) => {
+//     const token = localStorage.getItem("AUTH_TOKEN");
+//     if (!token) return;
+
+//     const encodedTaskId = encodeURIComponent(task.id);
+//     console.log("Updating/Editing task with ID:", encodedTaskId, "Data:", updatedFields);
+
+//     const config = {
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       withCredentials: true,
+//     };
+
+//     try {
+//       const response: AxiosResponse = await axios.post(
+//         `${BASE_URL}/updateItem`,
+//         {
+//           date: formattedDate,
+//           item_id: task.id,
+//           new_name: updatedFields.name || task.name,
+//           new_type: updatedFields.context?.itype || task.context?.itype || "task",
+//           new_status: updatedFields.context?.status || task.context?.status || "running",
+//           isFocused: updatedFields.isFocused !== undefined ? updatedFields.isFocused : task.isFocused,
+//         },
+//         config
+//       );
+
+//       if (task.isFocused) {
+//         setTodaysFocus((prev: Task[]) =>
+//           prev.map((t: Task) => (t.id === task.id ? { ...t, ...updatedFields, context: { ...t.context, ...updatedFields.context } } : t))
+//         );
+//       } else {
+//         setTodaysRituals((prev: Task[]) =>
+//           prev.map((t: Task) => (t.id === task.id ? { ...t, ...updatedFields, context: { ...t.context, ...updatedFields.context } } : t))
+//         );
+//         setInProgress((prev: Task[]) =>
+//           prev.map((t: Task) => (t.id === task.id ? { ...t, ...updatedFields, context: { ...t.context, ...updatedFields.context } } : t))
+//         );
+//         setTodaysRecurrings((prev: Task[]) =>
+//           prev.map((t: Task) => (t.id === task.id ? { ...t, ...updatedFields, context: { ...t.context, ...updatedFields.context } } : t))
+//         );
+//       }
+
+//       fetchFocusData();
+//       setEditingTask(null);
+//     } catch (error: any) {
+//       console.error("Error updating/editing task:", error.response?.data || error.message);
+//     }
+//   };
+
+//   const refreshTasks = () => {
+//     fetchFocusData();
+//   };
+
+//   const onEditTask = (task: Task) => {
+//     setEditingTask(task);
+//     console.log("Editing task:", task);
+//   };
+
+//   // The JSX return statement remains exactly the same as in your original code
+//   return (
+//     <div style={containerStyle} className="focus-container">
+//       <header style={headerStyle} className="focus-header">
+//         <h2 style={titleStyle} className="focus-title">Focus</h2>
+//         <p style={dateStyle} className="focus-date">{displayDate}</p>
+//       </header>
+
+//       {loading ? (
+//         <div style={loadingStyle} className="focus-loading">
+//           <span className="spinner"></span> Loading tasks...
+//         </div>
+//       ) : (
+//         <div style={{ display: "flex", gap: "20px" }}>
+//           <div style={{ flex: 1 }}>
+//             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
+//               <h3>Today's Focus <span style={{ fontSize: "12px" }}>+</span></h3>
+//               <p>These are your priorities for today</p>
+//               <TaskInput refreshTasks={refreshTasks} isFocused={true} />
+//               {todaysFocus.map((task: Task) => (
+//                 <TaskItem
+//                   key={task.id}
+//                   task={task}
+//                   refreshTasks={refreshTasks}
+//                   onEditTask={onEditTask}
+//                 />
+//               ))}
+//             </div>
+
+//             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
+//               <h3>In progress</h3>
+//               <p>These are your currently in progress items</p>
+//               {inProgress.map((task: Task) => (
+//                 <TaskItem
+//                   key={task.id}
+//                   task={task}
+//                   refreshTasks={refreshTasks}
+//                   onEditTask={onEditTask}
+//                 />
+//               ))}
+//             </div>
+//           </div>
+
+//           <div style={{ flex: 1 }}>
+//             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
+//               <h3>Today's Rituals <span style={{ fontSize: "12px" }}>🌱</span></h3>
+//               <p>These are the ritual tasks that you want to do today</p>
+//               {todaysRituals.map((task: Task) => (
+//                 <TaskItem
+//                   key={task.id}
+//                   task={task}
+//                   refreshTasks={refreshTasks}
+//                   onEditTask={onEditTask}
+//                 />
+//               ))}
+//             </div>
+
+//             <div style={{ backgroundColor: "#f9f9f9", borderRadius: "8px", marginBottom: "20px", padding: "15px" }}>
+//               <h3>Today's Recurrings</h3>
+//               <p>These are the recurring tasks that you want to do today</p>
+//               {todaysRecurrings.map((task: Task) => (
+//                 <TaskItem
+//                   key={task.id}
+//                   task={task}
+//                   refreshTasks={refreshTasks}
+//                   onEditTask={onEditTask}
+//                 />
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {editingTask && (
+//         <EditTaskModal
+//           task={editingTask}
+//           isOpen={!!editingTask}
+//           onClose={() => setEditingTask(null)}
+//           refreshTasks={refreshTasks}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// // Styles remain the same as in your original code
+// const containerStyle: React.CSSProperties = {
+//   flex: 1,
+//   padding: "40px",
+//   backgroundColor: "#f4f4f4",
+//   minHeight: "100vh",
+//   fontFamily: "Poppins, sans-serif",
+// };
+
+// const headerStyle: React.CSSProperties = {
+//   background: "linear-gradient(135deg, #f5f5f5, #e0e0e0)",
+//   padding: "25px 30px",
+//   borderRadius: "15px",
+//   boxShadow: "0 6px 15px rgba(0, 0, 0, 0.15)",
+//   marginBottom: "40px",
+//   position: "relative",
+//   overflow: "hidden",
+//   display: "flex",
+//   justifyContent: "space-between",
+//   alignItems: "center",
+// };
+
+// const titleStyle: React.CSSProperties = {
+//   fontSize: "36px",
+//   fontWeight: "800",
+//   marginBottom: "0",
+//   color: "#000000",
+//   letterSpacing: "1px",
+//   textShadow: "1px 1px 2px rgba(0, 0, 0, 0.1)",
+// };
+
+// const dateStyle: React.CSSProperties = {
+//   fontSize: "22px",
+//   color: "#000000",
+//   marginBottom: "0",
+//   fontWeight: "500",
+//   textShadow: "1px 1px 2px rgba(0, 0, 0, 0.1)",
+// };
+
+// const loadingStyle: React.CSSProperties = {
+//   display: "flex",
+//   alignItems: "center",
+//   justifyContent: "center",
+//   fontSize: "20px",
+//   color: "#666",
+//   marginTop: "30px",
+//   gap: "15px",
+// };
+
+// export default Focus;
