@@ -2062,7 +2062,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/updateItem`, {
+      const response = await fetch(`${BASE_URL}/update_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -2180,8 +2180,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
     }
 
     try {
-      console.log("Making moveItem API call:", { item_id: itemId, new_parent_id: newParentId });
-      const response = await fetch(`${BASE_URL}/moveItem`, {
+      console.log("Making move_item API call:", { item_id: itemId, new_parent_id: newParentId });
+      const response = await fetch(`${BASE_URL}/move_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -2223,7 +2223,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/deleteItem`, {
+      const response = await fetch(`${BASE_URL}/delete_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

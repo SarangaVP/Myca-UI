@@ -50,7 +50,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ task, isOpen, onClose, re
       isFocused: isFocused, 
     };
 
-    fetch(`${BASE_URL}/updateItem`, {
+    fetch(`${BASE_URL}/update_item`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

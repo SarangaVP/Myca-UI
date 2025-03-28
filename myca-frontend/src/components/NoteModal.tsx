@@ -205,7 +205,7 @@ const NoteModal: React.FC<NoteModalProps> = React.memo(({ isOpen, onClose, taskI
     setLoading(true);
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     try {
-      const response = await fetch(`${BASE_URL}/getItems`, {
+      const response = await fetch(`${BASE_URL}/get_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -244,7 +244,7 @@ const NoteModal: React.FC<NoteModalProps> = React.memo(({ isOpen, onClose, taskI
   const handleSave = useCallback(async () => {
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     try {
-      const response = await fetch(`${BASE_URL}/openNote`, {
+      const response = await fetch(`${BASE_URL}/open_note`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

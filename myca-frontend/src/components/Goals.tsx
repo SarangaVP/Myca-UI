@@ -3276,7 +3276,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
   const fetchTasks = async (token: string) => {
     setLoading(true);
     try {
-      const endpoint = `get${timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1)}`;
+      const endpoint = `get_${timePeriod.charAt(0) + timePeriod.slice(1)}`;
       const response = await fetch(`${BASE_URL}/${endpoint}`, {
         method: "POST",
         headers: {
@@ -3380,7 +3380,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
     setSelectedGoalId(goalId);
 
     try {
-      const response = await fetch(`${BASE_URL}/getItems`, {
+      const response = await fetch(`${BASE_URL}/get_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3458,7 +3458,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
 
   const fetchAssociatedItems = async (goalId: string, token: string) => {
     try {
-      const response = await fetch(`${BASE_URL}/getAssociatedItems`, {
+      const response = await fetch(`${BASE_URL}/get_associated_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3536,7 +3536,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/associatedItemsToGoal`, {
+      const response = await fetch(`${BASE_URL}/associated_items_to_goal`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3571,7 +3571,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/unassociatedItemsToGoal`, {
+      const response = await fetch(`${BASE_URL}/unassociated_items_to_goal`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3601,7 +3601,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
   const fetchNote = async (token: string) => {
     setNoteLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/addEnvisionNotes`, {
+      const response = await fetch(`${BASE_URL}/add_envision_notes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3641,7 +3641,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
 
     setNoteSaving(true);
     try {
-      const response = await fetch(`${BASE_URL}/addEnvisionNotes`, {
+      const response = await fetch(`${BASE_URL}/add_envision_notes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3671,7 +3671,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/createGoal`, {
+      const response = await fetch(`${BASE_URL}/create_goal`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3706,7 +3706,7 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/createGoal`, {
+      const response = await fetch(`${BASE_URL}/create_goal`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

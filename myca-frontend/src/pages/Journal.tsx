@@ -15,7 +15,7 @@ const Journal: React.FC = () => {
   const fetchJournalNote = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/journalNote`, {
+      const response = await fetch(`${BASE_URL}/journal_note`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const Journal: React.FC = () => {
   const saveJournalNote = async () => {
     setSaving(true);
     try {
-      const response = await fetch(`${BASE_URL}/journalNote`, {
+      const response = await fetch(`${BASE_URL}/journal_note`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

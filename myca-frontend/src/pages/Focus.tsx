@@ -777,7 +777,7 @@ const Focus: React.FC = () => {
 
     try {
       console.log("Fetching Today's Focus...");
-      const focusResponse = await fetch(`${BASE_URL}/getFocusList`, {
+      const focusResponse = await fetch(`${BASE_URL}/get_focus_list`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -789,17 +789,17 @@ const Focus: React.FC = () => {
           focused_items: [],
         }),
       });
-      console.log("getFocusList response status:", focusResponse.status);
+      console.log("get_focus_list response status:", focusResponse.status);
       if (!focusResponse.ok) {
         const errorText = await focusResponse.text();
-        console.error("getFocusList failed with status:", focusResponse.status, "Details:", errorText);
+        console.error("get_focus_list failed with status:", focusResponse.status, "Details:", errorText);
         throw new Error(`HTTP error for Today's Focus! Status: ${focusResponse.status}, Details: ${errorText}`);
       }
       const focusData = await focusResponse.json();
-      console.log("getFocusList succeeded, data:", focusData);
+      console.log("get_focus_list succeeded, data:", focusData);
 
       console.log("Fetching Today's Rituals...");
-      const ritualsResponse = await fetch(`${BASE_URL}/getRitualItems`, {
+      const ritualsResponse = await fetch(`${BASE_URL}/get_ritual_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -811,17 +811,17 @@ const Focus: React.FC = () => {
           ritual_list: [],
         }),
       });
-      console.log("getRitualItems response status:", ritualsResponse.status);
+      console.log("get_ritual_items response status:", ritualsResponse.status);
       if (!ritualsResponse.ok) {
         const errorText = await ritualsResponse.text();
-        console.error("getRitualItems failed with status:", ritualsResponse.status, "Details:", errorText);
+        console.error("get_ritual_items failed with status:", ritualsResponse.status, "Details:", errorText);
         throw new Error(`HTTP error for Today's Rituals! Status: ${ritualsResponse.status}, Details: ${errorText}`);
       }
       const ritualsData = await ritualsResponse.json();
-      console.log("getRitualItems succeeded, data:", ritualsData);
+      console.log("get_ritual_items succeeded, data:", ritualsData);
 
       console.log("Fetching In Progress...");
-      const inProgressResponse = await fetch(`${BASE_URL}/getInProgressItems`, {
+      const inProgressResponse = await fetch(`${BASE_URL}/get_inprogress_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -833,17 +833,17 @@ const Focus: React.FC = () => {
           in_progress_items: [],
         }),
       });
-      console.log("getInProgressItems response status:", inProgressResponse.status);
+      console.log("get_inprogress_items response status:", inProgressResponse.status);
       if (!inProgressResponse.ok) {
         const errorText = await inProgressResponse.text();
-        console.error("getInProgressItems failed with status:", inProgressResponse.status, "Details:", errorText);
+        console.error("get_inprogress_items failed with status:", inProgressResponse.status, "Details:", errorText);
         throw new Error(`HTTP error for In Progress! Status: ${inProgressResponse.status}, Details: ${errorText}`);
       }
       const inProgressData = await inProgressResponse.json();
-      console.log("getInProgressItems succeeded, data:", inProgressData);
+      console.log("get_inprogress_items succeeded, data:", inProgressData);
 
       console.log("Fetching Today's Recurrings...");
-      const recurringsResponse = await fetch(`${BASE_URL}/getRecurrenceItems`, {
+      const recurringsResponse = await fetch(`${BASE_URL}/get_recurrence_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -855,14 +855,14 @@ const Focus: React.FC = () => {
           focused_items: [],
         }),
       });
-      console.log("getRecurrenceItems response status:", recurringsResponse.status);
+      console.log("get_recurrence_items response status:", recurringsResponse.status);
       if (!recurringsResponse.ok) {
         const errorText = await recurringsResponse.text();
-        console.error("getRecurrenceItems failed with status:", recurringsResponse.status, "Details:", errorText);
+        console.error("get_recurrence_items failed with status:", recurringsResponse.status, "Details:", errorText);
         throw new Error(`HTTP error for Today's Recurrings! Status: ${recurringsResponse.status}, Details: ${errorText}`);
       }
       const recurringsData = await recurringsResponse.json();
-      console.log("getRecurrenceItems succeeded, data:", recurringsData);
+      console.log("get_recurrence_items succeeded, data:", recurringsData);
 
       const processTasks = (data: any): Task[] => {
         if (data.status === 200 && data.reports && data.reports.length > 0) {
@@ -934,7 +934,7 @@ const Focus: React.FC = () => {
     console.log("Updating/Editing task with ID:", encodedTaskId, "Data:", updatedFields);
 
     try {
-      const response = await fetch(`${BASE_URL}/updateItem`, {
+      const response = await fetch(`${BASE_URL}/update_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -953,7 +953,7 @@ const Focus: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("updateItem failed with status:", response.status, "Details:", errorText);
+        console.error("update_item failed with status:", response.status, "Details:", errorText);
         throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
       }
 

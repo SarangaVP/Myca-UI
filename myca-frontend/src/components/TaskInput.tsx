@@ -247,7 +247,7 @@ const TaskInput: React.FC<{
 
     try {
       // Step 1: Create the task
-      const createResponse = await fetch(`${BASE_URL}/createNewItem`, {
+      const createResponse = await fetch(`${BASE_URL}/create_new_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -267,7 +267,7 @@ const TaskInput: React.FC<{
 
       // Step 2: Update to set is_focused if needed
       if (isFocused) {
-        const updateResponse = await fetch(`${BASE_URL}/updateItem`, {
+        const updateResponse = await fetch(`${BASE_URL}/update_item`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

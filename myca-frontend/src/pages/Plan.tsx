@@ -620,7 +620,7 @@ const Plan: React.FC = () => {
       let response;
       if (selectedFilters.length > 0) {
         const statusList = selectedFilters.map((filter) => filterOptions[filter]);
-        response = await fetch(`${BASE_URL}/filterItem`, {
+        response = await fetch(`${BASE_URL}/filter_item`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -633,9 +633,9 @@ const Plan: React.FC = () => {
             filtered_items: {},
           }),
         });
-        console.log("filterItem response status:", response.status);
+        console.log("ffilter_item response status:", response.status);
       } else {
-        response = await fetch(`${BASE_URL}/getItems`, {
+        response = await fetch(`${BASE_URL}/get_items`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -644,7 +644,7 @@ const Plan: React.FC = () => {
           credentials: "include",
           body: JSON.stringify({ date_input: formattedDate, items_list: [] }),
         });
-        console.log("getItems response status:", response.status);
+        console.log("get_items response status:", response.status);
       }
 
       if (!response.ok) {

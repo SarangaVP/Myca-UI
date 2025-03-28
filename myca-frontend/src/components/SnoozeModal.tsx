@@ -263,7 +263,7 @@ const SnoozeModal: React.FC<SnoozeModalProps> = React.memo(({ isOpen, onClose, i
     setError(null);
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     try {
-      const response = await fetch(`${BASE_URL}/getItems`, {
+      const response = await fetch(`${BASE_URL}/get_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -307,7 +307,7 @@ const SnoozeModal: React.FC<SnoozeModalProps> = React.memo(({ isOpen, onClose, i
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${BASE_URL}/snoozeItem`, {
+      const response = await fetch(`${BASE_URL}/snooze_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -444,7 +444,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = React.memo(({ isOpen, on
     setLoading(true);
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     try {
-      const response = await fetch(`${BASE_URL}/getItems`, {
+      const response = await fetch(`${BASE_URL}/get_items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -520,7 +520,7 @@ const RecurrenceModal: React.FC<RecurrenceModalProps> = React.memo(({ isOpen, on
 
     const AUTH_TOKEN = localStorage.getItem("AUTH_TOKEN");
     try {
-      const response = await fetch(`${BASE_URL}/setUpRecurrence`, {
+      const response = await fetch(`${BASE_URL}/setup_recurrence`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -311,8 +311,8 @@ import "./App.css";
 const App: React.FC = () => {
   const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem("AUTH_TOKEN"));
 
-  const carryPreviousDay = async (token: string) => {
-    console.log("Starting carryPreviousDay with token:", token);
+  const carry_previous_day = async (token: string) => {
+    console.log("Starting carry_previous_day with token:", token);
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
@@ -320,7 +320,7 @@ const App: React.FC = () => {
     console.log("Sending request for date:", formattedYesterday);
 
     try {
-      const response = await fetch(`${BASE_URL}/carryPreviousDay`, {
+      const response = await fetch(`${BASE_URL}/carry_previous_day`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -332,12 +332,12 @@ const App: React.FC = () => {
       console.log("Got response with status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("carryPreviousDay failed with status:", response.status, "Details:", errorText);
-        throw new Error(`carryPreviousDay HTTP error! Status: ${response.status}, Details: ${errorText}`);
+        console.error("carry_previous_day failed with status:", response.status, "Details:", errorText);
+        throw new Error(`carry_previous_day HTTP error! Status: ${response.status}, Details: ${errorText}`);
       }
-      console.log("carryPreviousDay succeeded!");
+      console.log("carry_previous_day succeeded!");
     } catch (error) {
-      console.error("Error in carryPreviousDay:", error);
+      console.error("Error in carry_previous_day:", error);
     }
   };
 
@@ -345,7 +345,7 @@ const App: React.FC = () => {
     console.log("App useEffect running, checking token...");
     const token = localStorage.getItem("AUTH_TOKEN");
     if (token) {
-      carryPreviousDay(token);
+      carry_previous_day(token);
       if (token !== authToken) {
         setAuthToken(token);
       }

@@ -276,7 +276,7 @@ const GoalItem: React.FC<GoalItemProps> = ({
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/updateItem`, {
+      const response = await fetch(`${BASE_URL}/update_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -382,7 +382,7 @@ const GoalItem: React.FC<GoalItemProps> = ({
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/moveItem`, {
+      const response = await fetch(`${BASE_URL}/move_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -423,7 +423,7 @@ const GoalItem: React.FC<GoalItemProps> = ({
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/deleteItem`, {
+      const response = await fetch(`${BASE_URL}/delete_item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
