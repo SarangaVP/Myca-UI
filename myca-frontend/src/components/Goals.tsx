@@ -3247,31 +3247,31 @@ const Goals: React.FC<TimePeriodProps> = ({ timePeriod }) => {
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
-  const getDisplayText = () => {
+  const getHeaderTitle = () => {
     switch (timePeriod) {
-      case "year": return today.getFullYear().toString();
-      case "month": return today.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      case "year": return "Goals for " + today.getFullYear().toString();
+      case "month": return "Goals for " + today.toLocaleDateString("en-US", { month: "long", year: "numeric" });
       case "week": {
         const weekStart = new Date(today);
         weekStart.setDate(today.getDate() - today.getDay() + 1);
         const weekEnd = new Date(today);
         weekEnd.setDate(today.getDate() + (7 - today.getDay()));
-        return `${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} - ${weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+        return `Goals for ${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} - ${weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
       }
-      case "life": return "Life Goals";
+      case "life": return "Goals for Life";
       default: return "";
     }
   };
 
-  const getHeaderTitle = () => {
-    switch (timePeriod) {
-      case "life": return "Life Goals";
-      case "week": return "Weekly Goals";
-      case "month": return "Monthly Goals";
-      case "year": return "Yearly Goals";
-      default: return "Goals";
-    }
-  };
+  // const getHeaderTitle = () => {
+  //   switch (timePeriod) {
+  //     case "life": return "Life Goals";
+  //     case "week": return "Weekly Goals";
+  //     case "month": return "Monthly Goals";
+  //     case "year": return "Yearly Goals";
+  //     default: return "Goals";
+  //   }
+  // };
 
   const fetchTasks = async (token: string) => {
     setLoading(true);
